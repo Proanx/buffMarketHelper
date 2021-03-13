@@ -56,8 +56,8 @@
 
     function sortGoods(isAsc) {
         $("#j_list_card>ul>li").sort(function (a, b) {
-            let av = $(a).attr("data-sort") - 0;
-            let bv = $(b).attr("data-sort") - 0;
+            let av = $(a).attr("data-buff-sort") - 0;
+            let bv = $(b).attr("data-buff-sort") - 0;
             if (av > bv) {
                 return isAsc ? 1 : -1;
             } else if (av < bv) {
@@ -265,16 +265,11 @@
                 method: "get",
                 success: function (data) {
                     status--;
-                    let steam_price = $(data).find(".detail-summ .f_Strong>span.custom-currency")[0].getAttribute('data-price');
-                    let withoutFeePrice = getWithoutFeePrice(steam_price, true);
-                    let scale = getScale(buff_price, steam_price, true);
-                    $(goods[i]).attr("data-sort", scale);
-                    $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
-                    paintingGradient(scale, target, 3);
                     let steam_link = $(data).find(".detail-summ>a")[0].href;
                     getSteamOrderList(steam_link, url).then(function onFulfilled(json) {
                         let orderCount = $(json.buy_order_summary)[0].innerText;
                         let steamOrderScale = getScale(buff_price, (json.highest_buy_order / 100), true);
+                        $(goods[i]).attr("data-order-sort", steamOrderScale);
                         $(target).after($(steanOrderCountTemp).text(orderCount + "┊"));
                         paintingGradient(steamOrderScale, target, 4, steanOrderScaleTemp);
                     }).catch(function onRejected(err) {
@@ -282,14 +277,22 @@
                             err.statusText = "请求次数过多";
                         }
                         $(target).after($(steanOrderCountTemp).text(err.statusText));
-                    });
-                    if (status == 0) {
-                        if (needSort) {
-                            sortGoods(sortType);
+                    }).finally(() => {
+                        if (status == 0) {
+                            if (needSort) {
+                                sortGoods(sortType);
+                            }
+                            $("#sort_scale").addClass("enabled").addClass(sortType ? "w-Order_asc" : "w-Order_des");
+                            shade($("#sort_scale"), "background", alertColor, backgroundColor, 1000);
+                            // todo :删除shade等方法
                         }
-                        $("#sort_scale").addClass("enabled").addClass(sortType ? "w-Order_asc" : "w-Order_des");
-                        shade($("#sort_scale"), "background", alertColor, backgroundColor, 1000);
-                    }
+                    });
+                    let steam_price = $(data).find(".detail-summ .f_Strong>span.custom-currency")[0].getAttribute('data-price');
+                    let withoutFeePrice = getWithoutFeePrice(steam_price, true);
+                    let scale = getScale(buff_price, steam_price, true);
+                    $(goods[i]).attr("data-buff-sort", scale);
+                    $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
+                    paintingGradient(scale, target, 3);
                 },
                 error: function (msg) {
                     console.log(msg);
@@ -329,16 +332,7 @@
             } else {
                 $(this).addClass("enabled").addClass("w-Order_asc");
             }
-            $("#j_list_card>ul>li").sort(function (a, b) {
-                let av = $(a).attr("data-sort") - 0;
-                let bv = $(b).attr("data-sort") - 0;
-                if (av > bv) {
-                    return flag ? -1 : 1;
-                } else if (av < bv) {
-                    return flag ? 1 : -1;
-                }
-                return 0;
-            }).appendTo("#j_list_card>ul");
+            sortGoods(flag);
         });
         buff_csgo_list_scale_plugin_load();
         setTimeout(function () {

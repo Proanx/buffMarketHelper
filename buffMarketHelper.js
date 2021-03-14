@@ -18,28 +18,27 @@
 (function () {
     'use strict';
 
-
-
-    // 	-----自定义参数--------start---------------------
-
-    const min_range = 0.63;                     // 比例取值最小范围，小于等于这个值的比例会直接渲染成最小值渐变色
-    const needSort = 1;                         // 是否自动按比例排序      需要：1    不需要：0
-    const sortType = 1;                         // 排序规则    从低到高（升序）：1    从高到低（降序）：0
+    // 	-------------------------------------------------------自定义参数--------start--------------------------------------
+    // 比例取值最小范围，小于等于这个值的比例会直接渲染成最小值渐变色
+    const min_range = 0.63;
 
     // 市场页面的渐变色
-    var market_color_high = "80,39,255";        // 最大值渐变色，比例越接近最大值（默认是1）会越趋近这个颜色，格式：['r','g','b'] 或者 "r,g,b"
-    var market_color_low = "255,30,30";         // 最小值渐变色，比例越接近最小值（默认是0.63）会越趋近这个颜色，格式：['r','g','b'] 或者 "r,g,b"
+    // 最大值渐变色，比例越接近最大值（默认是1）会越趋近这个颜色，格式：['r','g','b'] 或者 "r,g,b"
+    var market_color_high = "80,39,255";
+    // 最小值渐变色，比例越接近最小值（默认是0.63）会越趋近这个颜色，格式：['r','g','b'] 或者 "r,g,b"
+    var market_color_low = "255,30,30";
 
-    // 	-----自定义参数--------end-----------------------
-
-
+    // 排序规则会记住上一次的选择，你只需要将对应的英文字母替换到等号后面分号前面就可以改成固定规则:
+    // 按buff比例从低到高   按buff比例从高到低      按求购比例从低到高   按求购比例从高到低
+    //  buff-sort.asc     buff-sort.desc        order-sort.asc   order-sort.desc
+    // 示例: var needSort = buff-sort.asc;
+    var needSort = GM_getValue("sortRule");
+    // 	-------------------------------------------------------自定义参数--------end---------------------------------------
 
     // 处理成数组
     if (!Array.isArray(market_color_high)) market_color_high = market_color_high.split(",");
     if (!Array.isArray(market_color_low)) market_color_low = market_color_low.split(",");
 
-    const alertColor = Array(0, 255, 72);
-    const backgroundColor = Array(69, 83, 108);
     const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;opacity: 0.8;\"></span>";
     const steanOrderCountTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;opacity: 0.8;\"></span>";
 
@@ -54,10 +53,10 @@
         if (result != null) return unescape(result[2]); return null; //返回参数值
     }
 
-    function sortGoods(isAsc) {
+    function sortGoods(sortRule, isAsc) {
         $("#j_list_card>ul>li").sort(function (a, b) {
-            let av = $(a).attr("data-buff-sort") - 0;
-            let bv = $(b).attr("data-buff-sort") - 0;
+            let av = $(a).attr(sortRule) - 0;
+            let bv = $(b).attr(sortRule) - 0;
             if (av > bv) {
                 return isAsc ? 1 : -1;
             } else if (av < bv) {
@@ -78,20 +77,6 @@
 
     function getScale(originPrice, withFeePrice, upOrDown) {
         return roundToTwo(originPrice / (withFeePrice / 1.15), upOrDown);
-    }
-
-    function shade(obj, prop, color1, color2, mills) {
-        let count = mills / 20;
-        let red = color1[0], green = color1[1], blue = color1[2];
-        let r = (color2[0] - color1[0]) / count, g = (color2[1] - color1[1]) / count, b = (color2[2] - color1[2]) / count;
-        for (let i = 1; i <= count; i++) {
-            setTimeout(() => {
-                obj.css(prop, "rgb(" + parseInt(red + r * i + 0.5) + "," + parseInt(green + g * i + 0.5) + "," + parseInt(blue + b * i + 0.5) + ")");
-            }, i * 40);
-        }
-        setTimeout(() => {
-            obj.css(prop, "");
-        }, 3000);
     }
 
     function gradient(max, min, f) {
@@ -196,6 +181,27 @@
         });
     }
 
+    function updateProgressBar(bar, progress, option) {
+        let widthP = Math.round(bar.width() / document.body.clientWidth * 100);
+        switch (option) {
+            case "set":
+                bar.width(progress + "%");
+                break;
+            default:
+            case "add":
+                widthP += progress;
+                bar.width(widthP + "%");
+                break;
+            case "sub":
+                widthP -= progress;
+                bar.width(widthP < 0 ? 0 : widthP + "%");
+                break;
+        }
+        if (widthP >= 120) {
+            bar.fadeOut(500);
+        }
+    }
+
     // 商品详情
     window.buff_csgo_goods_scale_plugin_load = function (steam_price) {
         // 检测商品是否加载完成
@@ -253,17 +259,22 @@
         }
         if ($("#j_list_card").hasClass("calculated")) { return; }
         $(".list_card li>p>span.l_Right").removeClass("l_Right").addClass("l_Left");
+        var barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
         var goods = $("#j_list_card>ul>li");
         var status = goods.length;
+        // 添加进度条
+        $("body").prepend($('<div id=' + barID + ' class="helper-progress-bar" style="height: 10px;background: linear-gradient(90deg, #26d88dbf, #26c8d880,transparent);bottom:0px;position: fixed;z-index: 1000;"></div>'));
         for (let i = 0; i < goods.length; i++) {
             let target = $(goods[i]).find("p>strong.f_Strong")[0];
             let buff_price = target.innerText.slice(2);
             let url = $(goods[i]).children("a")[0].href;
+            $(goods[i]).attr("data-default-sort", i);
             //	buff的ajax
             $.ajax({
                 url: url,
                 method: "get",
                 success: function (data) {
+                    updateProgressBar($("#" + barID), 3);
                     status--;
                     let steam_link = $(data).find(".detail-summ>a")[0].href;
                     getSteamOrderList(steam_link, url).then(function onFulfilled(json) {
@@ -278,13 +289,10 @@
                         }
                         $(target).after($(steanOrderCountTemp).text(err.statusText));
                     }).finally(() => {
-                        if (status == 0) {
-                            if (needSort) {
-                                sortGoods(sortType);
-                            }
-                            $("#sort_scale").addClass("enabled").addClass(sortType ? "w-Order_asc" : "w-Order_des");
-                            shade($("#sort_scale"), "background", alertColor, backgroundColor, 1000);
-                            // todo :删除shade等方法
+                        updateProgressBar($("#" + barID), 3);
+                        if (status == 0 && needSort) {
+                            let arr = needSort.split(".");
+                            sortGoods("data-" + arr[0], arr[1] == "asc");
                         }
                     });
                     let steam_price = $(data).find(".detail-summ .f_Strong>span.custom-currency")[0].getAttribute('data-price');
@@ -324,21 +332,52 @@
             $("#sort_scale").removeClass();
         }).parent().css("cursor", "pointer");
         // 排序按钮
-        $(".block-header>.l_Right").append($('<div id="sort_scale"><span>比例<i class="icon icon_order"></i></span></div>'));
-        $("#sort_scale").click(function () {
-            let flag = $(this).hasClass("w-Order_asc");
-            if ($(this).hasClass("enabled")) {
-                $(this).toggleClass("w-Order_asc w-Order_des");
-            } else {
-                $(this).addClass("enabled").addClass("w-Order_asc");
+        $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="default">默认</li><li data-value="buff-sort.asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort.desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort.asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort.desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
+        if (needSort) {
+            let list = $(".buff-helper-sort li");
+            for (let index = 1; index < list.length; index++) {
+                let element = list[index];
+                if (element.dataset.value == needSort) {
+                    $("#helper-sort-text").text(element.innerText);
+                    break;
+                }
             }
-            sortGoods(flag);
+        }
+        var sortBtnTimeout;
+        $(".buff-helper-sort").click(function () {
+            $(this).addClass("on");
+            clearTimeout(sortBtnTimeout);
+        }).mouseleave(function () {
+            let t = $(this);
+            if (t.hasClass("on")) {
+                sortBtnTimeout = setTimeout(() => t.removeClass("on"), 300);
+            }
         });
+        $(".buff-helper-sort li").click(function (e) {
+            e.stopPropagation();
+            if (this.dataset.value == "default") {
+                GM_setValue("sortRule", null);
+                $("#helper-sort-text").text("比例排序");
+                sortGoods("data-default-sort", true);
+            } else {
+                GM_setValue("sortRule", this.dataset.value);
+                needSort = this.dataset.value;
+                $("#helper-sort-text").text(this.innerText);
+                let arr = this.dataset.value.split(".");
+                sortGoods("data-" + arr[0], arr[1] == "asc");
+            }
+            $(".buff-helper-sort").removeClass("on");
+        });
+        // 排序进度条 总长度200%
         buff_csgo_list_scale_plugin_load();
         setTimeout(function () {
+            $(document).ajaxSend(function (event, status, header, result) {
+                if (header.url.slice(0, 17) === "/api/market/goods") {
+                    $(".helper-progress-bar").remove();
+                }
+            });
             $(document).ajaxSuccess(function (event, status, header, result) {
                 if (header.url.slice(0, 17) === "/api/market/goods") {
-                    $("#sort_scale").removeClass();
                     buff_csgo_list_scale_plugin_load();
                 }
             });

@@ -39,8 +39,8 @@
     if (!Array.isArray(market_color_high)) market_color_high = market_color_high.split(",");
     if (!Array.isArray(market_color_low)) market_color_low = market_color_low.split(",");
 
-    const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;opacity: 0.8;\"></span>";
-    const steanOrderCountTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;opacity: 0.8;\"></span>";
+    const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+    const steanOrderCountTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
 
     function getUrlParam(name, url) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象

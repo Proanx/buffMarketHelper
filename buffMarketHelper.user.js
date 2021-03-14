@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         网易BUFF价格比例(找挂刀)插件
 // @namespace    http://pronax.wtf/
-// @version      2021-3-10 14:06:18
+// @version      2021-3-14 15:48:17
 // @description  你的挂刀得力助手，有问题反馈可以直接发邮件给我（funkyturkey@yeah.net）在greasy上发issue也可以，不过可能响应比较慢
 // @copyright    2020, Pronax
 // @author       Pronax

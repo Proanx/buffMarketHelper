@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name         网易BUFF价格比例(找挂刀)插件
+// @name         网易BUFF饰品市场小帮手
 // @namespace    http://pronax.wtf/
-// @version      2021-3-14 15:48:17
-// @description  你的挂刀得力助手，有问题反馈可以直接发邮件给我（funkyturkey@yeah.net）在greasy上发issue也可以，不过可能响应比较慢
+// @version      1.8.1
+// @description  找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈邮箱funkyturkey@yeah.net
+// @description  更新于2021年3月14日18:51:42
 // @copyright    2020, Pronax
 // @author       Pronax
-// @license      MIT
+// @license      AGPL-3.0
 // @match        https://buff.163.com/market/goods*
 // @match        https://buff.163.com/market/?game=csgo*
 // @match        https://buff.163.com/market/?game=dota2*

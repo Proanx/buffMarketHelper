@@ -1,19 +1,22 @@
 // ==UserScript==
-// @name         网易BUFF饰品市场小帮手
-// @namespace    http://pronax.wtf/
-// @version      1.8.1
-// @description  找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈邮箱funkyturkey@yeah.net
-// @description  更新于2021年3月14日18:51:42
-// @copyright    2020, Pronax
-// @author       Pronax
-// @license      AGPL-3.0
-// @match        https://buff.163.com/market/goods*
-// @match        https://buff.163.com/market/?game=csgo*
-// @match        https://buff.163.com/market/?game=dota2*
-// @grant        GM_addStyle
-// @grant        GM_xmlhttpRequest
-// @grant        GM_setValue
-// @grant        GM_getValue
+// @name            网易BUFF饰品市场小帮手
+// @version         1.8.1
+// @note            更新于2021年3月14日18:51:42
+// @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
+// @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
+// @author          Pronax
+// @namespace       http://pronax.wtf/
+// @copyright       2021, Pronax
+// @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
+// @feedback-url    https://jq.qq.com/?_wv=1027&k=U8mqorxQ
+// @license         AGPL-3.0
+// @match           https://buff.163.com/market/goods*
+// @match           https://buff.163.com/market/?game=csgo*
+// @match           https://buff.163.com/market/?game=dota2*
+// @grant           GM_xmlhttpRequest
+// @grant           GM_addStyle
+// @grant           GM_setValue
+// @grant           GM_getValue
 // ==/UserScript==
 
 (function () {

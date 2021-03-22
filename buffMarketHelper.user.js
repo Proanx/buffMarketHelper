@@ -2,14 +2,13 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.0.0
-// @note            更新于2021年3月21日
+// @version         2.0.3
+// @note            更新于2021年3月22日
 // @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
+// @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 // @feedback-url    https://jq.qq.com/?_wv=1027&k=U8mqorxQ
-// @feedback-url    https://jq.qq.com/?_wv=1027&k=U8mqorxQ
-// @copyright       2021, Pronax
 // @license         AGPL-3.0
 // @match           https://buff.163.com/market/goods*
 // @match           https://buff.163.com/market/?game=csgo*

@@ -45,7 +45,9 @@ if (!Array.isArray(market_color_high)) market_color_high = market_color_high.spl
 if (!Array.isArray(market_color_low)) market_color_low = market_color_low.split(",");
 
 const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
-const steanorderNumberTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+const steanOrderNumberTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+var itemCount = 0;
+var itemNum = 0;
 
 function getUrlParam(name, url) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -186,22 +188,28 @@ function getSteamOrderList(buff_item_id, steamLink) {
 }
 
 function updateProgressBar(bar, progress, option) {
-    let widthP = Math.round(bar.width() / document.body.clientWidth * 100);
-    switch (option) {
-        case "set":
-            bar.width(progress + "%");
-            break;
-        default:
-        case "add":
-            widthP += progress;
-            bar.width(widthP + "%");
-            break;
-        case "sub":
-            widthP -= progress;
-            bar.width(widthP < 0 ? 0 : widthP + "%");
-            break;
+    if (!progress && !option) {
+        bar.width(++itemCount / itemNum * 100 + "%")
+    } else {
+        let widthP = Math.round(bar.width() / document.body.clientWidth * 100);
+        switch (option) {
+            case "set":
+                bar.width(progress + "%");
+                break;
+            default:
+            case "add":
+                itemCount++;
+                widthP += progress;
+                bar.width(widthP + "%");
+                break;
+            case "sub":
+                itemCount--;
+                widthP -= progress;
+                bar.width(widthP < 0 ? 0 : widthP + "%");
+                break;
+        }
     }
-    if (widthP >= 100) {
+    if (itemCount >= itemNum) {
         bar.fadeOut(500);
     }
 }
@@ -280,6 +288,7 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
     $(".list_card li>p>span.l_Right").removeClass("l_Right").addClass("l_Left");
     var barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
     var goods = $("#j_list_card>ul>li");
+    itemNum = items.length;
     // 添加进度条
     $("body").prepend($('<div id=' + barID + ' class="helper-progress-bar" style="height: 10px;background: linear-gradient(90deg, #26d88dbf, #26c8d880,transparent);bottom:0px;position: fixed;z-index: 1000;"></div>'));
     for (let i = 0; i < goods.length; i++) {
@@ -302,20 +311,20 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
             let orderNumber = $(json.buy_order_summary)[0].innerText;
             let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order);
             $(goods[i]).attr("data-order-sort", steamOrderScale);
-            $(target).after($(steanorderNumberTemp).text(orderNumber + "┊"));
+            $(target).after($(steanOrderNumberTemp).text(orderNumber + "┊"));
             paintingGradient(steamOrderScale, target, 4, steanOrderScaleTemp);
         }).catch(function onRejected(err) {
             if (err.status == 429) {
                 err.statusText = "请求次数过多";
             }
-            $(target).after($(steanorderNumberTemp).text(err.statusText));
+            $(target).after($(steanOrderNumberTemp).text(err.statusText));
         }).finally(() => {
             let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
             let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
             $(goods[i]).attr("data-buff-sort", scale);
             $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
             paintingGradient(scale, target, 3);
-            updateProgressBar($("#" + barID), 5);
+            updateProgressBar($("#" + barID));
             if (needSort) {
                 let arr = needSort.split(".");
                 sortGoods("data-" + arr[0], arr[1] == "asc");
@@ -327,7 +336,7 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
 
 
 if (location.pathname === "/market/goods") {
-    GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #9c6c0d;font-size: 12px;margin-left: 6px;}");
+    GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
     $(document).ajaxSuccess(function (event, status, header, result) {
         if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
             buff_csgo_goods_scale_plugin_load(result.data);

@@ -45,6 +45,8 @@
 
     const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
     const steanOrderCountTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+    var itemCount = 0;
+    var itemNum = 0;
 
     function getUrlParam(name, url) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -186,22 +188,28 @@
     }
 
     function updateProgressBar(bar, progress, option) {
-        let widthP = Math.round(bar.width() / document.body.clientWidth * 100);
-        switch (option) {
-            case "set":
-                bar.width(progress + "%");
-                break;
-            default:
-            case "add":
-                widthP += progress;
-                bar.width(widthP + "%");
-                break;
-            case "sub":
-                widthP -= progress;
-                bar.width(widthP < 0 ? 0 : widthP + "%");
-                break;
+        if (!progress && !option) {
+            bar.width(Math.round(++itemCount / itemNum * 100) + "%");
+        } else {
+            let widthP = Math.round(bar.width() / document.body.clientWidth * 100);
+            switch (option) {
+                case "set":
+                    bar.width(progress + "%");
+                    break;
+                default:
+                case "add":
+                    itemCount++;
+                    widthP += progress;
+                    bar.width(widthP + "%");
+                    break;
+                case "sub":
+                    itemCount--;
+                    widthP -= progress;
+                    bar.width(widthP < 0 ? 0 : widthP + "%");
+                    break;
+            }
         }
-        if (widthP >= 120) {
+        if (itemCount >= itemNum) {
             bar.fadeOut(500);
         }
     }
@@ -266,6 +274,7 @@
         var barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
         var goods = $("#j_list_card>ul>li");
         var status = goods.length;
+        itemNum = goods.length * 2;
         // 添加进度条
         $("body").prepend($('<div id=' + barID + ' class="helper-progress-bar" style="height: 10px;background: linear-gradient(90deg, #26d88dbf, #26c8d880,transparent);bottom:0px;position: fixed;z-index: 1000;"></div>'));
         for (let i = 0; i < goods.length; i++) {
@@ -278,7 +287,7 @@
                 url: url,
                 method: "get",
                 success: function (data) {
-                    updateProgressBar($("#" + barID), 3);
+                    updateProgressBar($("#" + barID));
                     status--;
                     let steam_link = $(data).find(".detail-summ>a")[0].href;
                     getSteamOrderList(steam_link, url).then(function onFulfilled(json) {
@@ -293,7 +302,7 @@
                         }
                         $(target).after($(steanOrderCountTemp).text(err.statusText));
                     }).finally(() => {
-                        updateProgressBar($("#" + barID), 3);
+                        updateProgressBar($("#" + barID));
                         if (status == 0 && needSort) {
                             let arr = needSort.split(".");
                             sortGoods("data-" + arr[0], arr[1] == "asc");

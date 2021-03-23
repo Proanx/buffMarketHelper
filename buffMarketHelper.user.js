@@ -45,12 +45,14 @@ if (!Array.isArray(market_color_low)) market_color_low = market_color_low.split(
 
 const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
 const steanOrderNumberTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+var steam_lowest_sell_order_detail = 0;            // 商品详情页专用-steam最低出售价
+var steam_highest_buy_order_detail = 0;            // 商品详情页专用-steam最高求购价
 var itemCount = 0;
 var itemNum = 0;
 
 function getUrlParam(name, url) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-    var result
+    let result;
     if (url) {
         result = url.substr(34).match(reg);  //匹配目标参数
     } else {
@@ -101,7 +103,7 @@ function gradient(max, min, f) {
 }
 
 function paintingGradient(scale, target, position, targetTemplate) {
-    var template;
+    let template;
     if (targetTemplate) {
         template = targetTemplate;
     } else {
@@ -209,6 +211,7 @@ function updateProgressBar(bar, progress, option) {
         }
     }
     if (itemCount >= itemNum) {
+        itemCount = 0;
         bar.fadeOut(500);
     }
 }
@@ -228,15 +231,12 @@ window.buff_csgo_goods_scale_plugin_load = function (data) {
     let buff_item_id = getUrlParam("goods_id");
     let items = data.items;
     let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny;
-    let steam_lowest_sell_order = 0;            // steam最低出售价
     let steam_price_without_fee = 0;            // steam卖出实收         
-    window.steam_highest_buy_order = 0;         // steam最高求购价
     let pm = new Promise(function (resolve, reject) {
         if (isFirstTime) {
             getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
-                window.steam_highest_buy_order = json.highest_buy_order / 100;
-                steam_lowest_sell_order = json.lowest_sell_order / 100;
-                steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cn);
+                steam_highest_buy_order_detail = json.highest_buy_order / 100;
+                steam_lowest_sell_order_detail = json.lowest_sell_order / 100;
                 $(".detail-cont").append("<div id='steam_order'>" + json.buy_order_summary + "</div>");
             }).catch(function onRejected(err) {
                 $(".detail-cont").append("<div id='steam_order'>" + err.statusText + "</div>");
@@ -247,7 +247,8 @@ window.buff_csgo_goods_scale_plugin_load = function (data) {
             reject();
         }
     });
-    pm.finally(function onFulfilled(json) {
+    pm.catch(e => { }).finally(function onFulfilled() {
+        steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny);
         for (let i = 0; i < items.length; i++) {
             let buff_sell_price = items[i].price;
             let scale = roundToTwo(buff_sell_price / steam_price_without_fee);
@@ -263,11 +264,11 @@ window.buff_csgo_goods_scale_plugin_load = function (data) {
                     default: color = "#ff0049"; break;
                 }
                 if (isFirstTime) {
-                    $(".market_commodity_orders_header_promote:last").after("<small class='market_listing_price_with_fee'>" + getScale(buff_sell_price, window.steam_highest_buy_order) + "</small>");
+                    $(".market_commodity_orders_header_promote:last").after("<small class='market_listing_price_with_fee'>" + getScale(buff_sell_price, steam_highest_buy_order_detail) + "</small>");
                     $(price_list[isLogined ? 1 : 0]).append($("<big class='good_scale' style='color: " + color + ";margin-left: 6px'>" + scale + "</big>"));
                 } else {
                     $(".good_scale").text(scale).css("color", color);
-                    $(".market_listing_price_with_fee").text(getScale(buff_sell_price, window.steam_highest_buy_order));
+                    $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                 }
             }
             $(price_list[i + (isLogined ? 2 : 1)].parentNode).next().append($("<b>" + scale + "</b>"));
@@ -285,13 +286,12 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
     }
     if ($("#j_list_card").hasClass("calculated")) { return; }
     $(".list_card li>p>span.l_Right").removeClass("l_Right").addClass("l_Left");
-    var barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
-    var goods = $("#j_list_card>ul>li");
+    let barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
+    let goods = $("#j_list_card>ul>li");
     itemNum = items.length;
     // 添加进度条
-    $("body").prepend($('<div id=' + barID + ' class="helper-progress-bar" style="height: 10px;background: linear-gradient(90deg, #26d88dbf, #26c8d880,transparent);bottom:0px;position: fixed;z-index: 1000;"></div>'));
+    $(".market-list .blank20").prepend($('<div id=' + barID + ' class="helper-progress-bar"></div>'));
     for (let i = 0; i < goods.length; i++) {
-        // for (let i = 0; i < 1; i++) {
         let target = $(goods[i]).find("p>strong.f_Strong")[0];
         $(goods[i]).attr("data-default-sort", i);
         let buff_item_id = items[i].id;                                 // buff商品ID
@@ -313,8 +313,13 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
             $(target).after($(steanOrderNumberTemp).text(orderNumber + "┊"));
             paintingGradient(steamOrderScale, target, 4, steanOrderScaleTemp);
         }).catch(function onRejected(err) {
-            if (err.status == 429) {
-                err.statusText = "请求次数过多";
+            switch (err.status) {
+                case 429:
+                    err.statusText = "请求次数过多";
+                    break;
+                case 500:
+                    err.statusText = "请重试";
+                    break;
             }
             $(target).after($(steanOrderNumberTemp).text(err.statusText));
         }).finally(() => {
@@ -323,16 +328,15 @@ window.buff_csgo_list_scale_plugin_load = function (items) {
             $(goods[i]).attr("data-buff-sort", scale);
             $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
             paintingGradient(scale, target, 3);
-            updateProgressBar($("#" + barID));
             if (needSort) {
                 let arr = needSort.split(".");
                 sortGoods("data-" + arr[0], arr[1] == "asc");
             }
+            updateProgressBar($("#" + barID));
         });
     }
     $("#j_list_card").addClass("calculated");
 }
-
 
 if (location.pathname === "/market/goods") {
     GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
@@ -344,6 +348,7 @@ if (location.pathname === "/market/goods") {
 } else if (location.pathname === "/market/") {
     // 样式
     GM_addStyle("#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li h3{margin: 8px 12px 9px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}");
+    GM_addStyle(".helper-progress-bar{height:20px;background:linear-gradient(90deg,rgba(38,216,141,0.75) 0,rgba(38,200,216,0.5) 70%,transparent);width:0;z-index:1000}")
     // 下一页按钮
     $(".floatbar>ul").prepend("<li><a id='buff_tool_nextpage'><i class='icon icon_comment_arr' style='transform: rotate(90deg); width: 1.125rem; height: 1.125rem; left: 0.25rem; position: relative;'></i><p style='color:#fff;'>下一页</p></a></li>");
     $("#buff_tool_nextpage").click(function () {
@@ -362,7 +367,7 @@ if (location.pathname === "/market/goods") {
             }
         }
     }
-    var sortBtnTimeout;
+    var sortBtnTimeout;  // 无
     $(".buff-helper-sort").click(function () {
         $(this).addClass("on");
         clearTimeout(sortBtnTimeout);

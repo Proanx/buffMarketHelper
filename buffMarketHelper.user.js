@@ -188,6 +188,20 @@ function getSteamOrderList(buff_item_id, steamLink) {
     });
 }
 
+function addNextPageBtn() {
+    if ($(".floatbar>ul").length == 0) {
+        setTimeout(() => { addNextPageBtn(); }, 100);
+        return;
+    }
+    if ($("#buff_tool_nextpage").length != 0) { return; }
+    // 下一页按钮
+    $(".floatbar>ul").prepend("<li><a id='buff_tool_nextpage'><i class='icon icon_comment_arr' style='transform: rotate(90deg); width: 1.125rem; height: 1.125rem; left: 0.25rem; position: relative;'></i><p style='color:#fff;'>下一页</p></a></li>");
+    $("#buff_tool_nextpage").click(function () {
+        $(".page-link.next").click();
+        $("#sort_scale").removeClass();
+    }).parent().css("cursor", "pointer");
+}
+
 function updateProgressBar(bar, progress, option) {
     if (!progress && !option) {
         bar.width(++itemCount / itemNum * 100 + "%")
@@ -349,12 +363,7 @@ if (location.pathname === "/market/goods") {
     // 样式
     GM_addStyle("#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li h3{margin: 8px 12px 9px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}");
     GM_addStyle(".helper-progress-bar{height:20px;background:linear-gradient(90deg,rgba(38,216,141,0.75) 0,rgba(38,200,216,0.5) 70%,transparent);width:0;z-index:1000}")
-    // 下一页按钮
-    $(".floatbar>ul").prepend("<li><a id='buff_tool_nextpage'><i class='icon icon_comment_arr' style='transform: rotate(90deg); width: 1.125rem; height: 1.125rem; left: 0.25rem; position: relative;'></i><p style='color:#fff;'>下一页</p></a></li>");
-    $("#buff_tool_nextpage").click(function () {
-        $(".page-link.next").click();
-        $("#sort_scale").removeClass();
-    }).parent().css("cursor", "pointer");
+    addNextPageBtn();
     // 排序按钮
     $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="default">默认</li><li data-value="buff-sort.asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort.desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort.asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort.desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
     if (needSort) {
@@ -367,7 +376,7 @@ if (location.pathname === "/market/goods") {
             }
         }
     }
-    var sortBtnTimeout;  // 无
+    var sortBtnTimeout;
     $(".buff-helper-sort").click(function () {
         $(this).addClass("on");
         clearTimeout(sortBtnTimeout);

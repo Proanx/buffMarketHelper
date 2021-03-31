@@ -76,16 +76,16 @@
     }
 
     // 保留2位小数
-    function roundToTwo(num, upOrDown) { // upOrDown为true时四舍五入
-        return upOrDown ? Math.round((num * 100) + 0.5) / 100 : Math.round((num * 100)) / 100;
+    function roundToTwo(num) {
+        return Math.round(num * 100) / 100;
     }
 
-    function getWithoutFeePrice(originPrice, upOrDown) {
-        return roundToTwo(originPrice / 1.15, upOrDown);
+    function getWithoutFeePrice(originPrice) {
+        return roundToTwo(originPrice / 1.15);
     }
 
-    function getScale(originPrice, withFeePrice, upOrDown) {
-        return roundToTwo(originPrice / (withFeePrice / 1.15), upOrDown);
+    function getScale(originPrice, withFeePrice) {
+        return roundToTwo(originPrice / (withFeePrice / 1.15));
     }
 
     function gradient(max, min, f) {
@@ -353,6 +353,9 @@
                 $(target).after($(steanOrderNumberTemp).text(err.statusText));
             }).finally(() => {
                 let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
+                if(withoutFeePrice>10000){  // 防止价格太长换行
+                    withoutFeePrice = Math.round(withoutFeePrice);
+                }
                 let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
                 $(goods[i]).attr("data-buff-sort", scale);
                 $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));

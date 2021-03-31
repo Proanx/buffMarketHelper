@@ -238,7 +238,7 @@
             setTimeout(buff_csgo_goods_scale_plugin_load, 100);
             return;
         }
-        if ($("#market-selling-list").hasClass("calculated")) { return; }
+        if ($("#market-selling-list").hasClass("calculated") || data.total_count == 0) { return; }
         let price_list = $(".f_Strong");
         let isLogined = price_list[0].getAttribute("id") == "navbar-cash-amount";
         let isFirstTime = $(".good_scale").length == 0;
@@ -353,10 +353,11 @@
                 $(target).after($(steanOrderNumberTemp).text(err.statusText));
             }).finally(() => {
                 let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
-                if(withoutFeePrice>10000){  // 防止价格太长换行
-                    withoutFeePrice = Math.round(withoutFeePrice);
-                }
                 let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
+                if (withoutFeePrice > 10000 || buff_sell_min_price > 10000) {  // 防止价格太长换行
+                    withoutFeePrice = Math.round(withoutFeePrice);
+                    scale = scale > 10 ? Math.round(scale) : Math.round(scale * 10) / 10;
+                }
                 $(goods[i]).attr("data-buff-sort", scale);
                 $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
                 paintingGradient(scale, target, 3);
@@ -371,9 +372,12 @@
     }
 
     if (location.pathname === "/market/goods") {
-        GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle("#batch-buy-btn{display:none !important}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
+                if ($("#helper-bulk-buy").length == 0) {
+                    $("#batch-buy-btn").after($('<a href="javascript:" class="i_Btn i_Btn_mid" id="helper-bulk-buy">批量购买</a>'));
+                }
                 buff_csgo_goods_scale_plugin_load(result.data);
             }
         });
@@ -406,13 +410,13 @@
         });
         $(".buff-helper-sort li").click(function (e) {
             e.stopPropagation();
+            needSort = this.dataset.value;
             if (this.dataset.value == "default") {
                 GM_setValue("sortRule", null);
                 $("#helper-sort-text").text("比例排序");
                 sortGoods("data-default-sort", true);
             } else {
                 GM_setValue("sortRule", this.dataset.value);
-                needSort = this.dataset.value;
                 $("#helper-sort-text").text(this.innerText);
                 let arr = this.dataset.value.split(".");
                 sortGoods("data-" + arr[0], arr[1] == "asc");
@@ -430,5 +434,5 @@
             }
         });
     }
-    
+
 })();

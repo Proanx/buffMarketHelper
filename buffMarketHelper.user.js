@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.0.4
-// @note            更新于2021年3月30日17:47:06
+// @version         2.0.6
+// @note            更新于2021年4月1日11:34:23
 // @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @copyright       2021, Pronax
@@ -297,7 +297,7 @@
                         $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                     }
                 }
-                $(price_list[i + (isLogined ? 2 : 1)].parentNode).next().append($("<b>" + scale + "</b>"));
+                $(price_list[i + (isLogined ? 2 : 1)]).after($("<b class='seller_scale'>" + scale + "</b>").css("padding-left","7px"));
             }
             $("#market-selling-list").addClass("calculated");
         });
@@ -372,7 +372,7 @@
     }
 
     if (location.pathname === "/market/goods") {
-        GM_addStyle("#batch-buy-btn{display:none !important}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}#batch-buy-btn{display:none !important}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
                 if ($("#helper-bulk-buy").length == 0) {

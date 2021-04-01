@@ -372,12 +372,12 @@
     }
 
     if (location.pathname === "/market/goods") {
-        GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}#batch-buy-btn{display:none !important}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
-                if ($("#helper-bulk-buy").length == 0) {
-                    $("#batch-buy-btn").after($('<a href="javascript:" class="i_Btn i_Btn_mid" id="helper-bulk-buy">批量购买</a>'));
-                }
+                // if ($("#helper-bulk-buy").length == 0) {
+                //     $("#batch-buy-btn").after($('<a href="javascript:" class="i_Btn i_Btn_mid" id="helper-bulk-buy">批量购买</a>'));
+                // }
                 buff_csgo_goods_scale_plugin_load(result.data);
             }
         });

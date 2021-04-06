@@ -240,7 +240,7 @@
         }
         if ($("#market-selling-list").hasClass("calculated") || data.total_count == 0) { return; }
         let price_list = $(".f_Strong");
-        let isLogined = price_list[0].getAttribute("id") == "navbar-cash-amount";
+        let isLogined = $("#navbar-cash-amount").length==1;
         let isFirstTime = $(".good_scale").length == 0;
         let steamLink = document.getElementsByClassName("detail-summ")[0].lastElementChild.href;
         let buff_item_id = getUrlParam("goods_id");
@@ -298,7 +298,10 @@
                         $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                     }
                 }
-               $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after('<td class="t_Left"><div style="display: table-cell;"><b class="seller_scale">' + scale + '</b></div></td>');
+                if (scale>10) {  // 防止价格太长换行
+                    scale = scale > 100 ? Math.round(scale) : Math.round(scale * 10) / 10;
+                }
+                $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after('<td class="t_Left"><div style="display: table-cell;"><b class="seller_scale">' + scale + '</b></div></td>');
             }
             $("#market-selling-list").addClass("calculated");
         });
@@ -376,6 +379,7 @@
         GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
+                // 批量购买（未完成）
                 // if ($("#helper-bulk-buy").length == 0) {
                 //     $("#batch-buy-btn").after($('<a href="javascript:" class="i_Btn i_Btn_mid" id="helper-bulk-buy">批量购买</a>'));
                 // }
@@ -424,6 +428,15 @@
             }
             $(".buff-helper-sort").removeClass("on");
         });
+        // 修改buff排序时重置比例排序规则
+        // setTimeout(() => {
+        //     $("div[name='sort_by']").change(function () {
+        //         if(this.getAttribute("value")){
+        //             needSort = this.dataset.value;
+        //             $("#helper-sort-text").text("默认");
+        //         }
+        //     });
+        // }, 500);
         $(document).ajaxSend(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods")) {
                 $(".helper-progress-bar").remove();

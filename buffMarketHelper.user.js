@@ -280,7 +280,6 @@
                 let buff_sell_price = items[i].price;
                 let scale = roundToTwo(buff_sell_price / steam_price_without_fee);
                 if (!i) {
-                    $(".detail-summ>a").prop("href", $(".detail-summ>a").prop("href") + "?buffPrice=" + buff_sell_price);
                     $(".f_Strong .hide-usd")[0].innerText = steam_price_without_fee;
                     let color;
                     switch (true) {
@@ -291,9 +290,11 @@
                         default: color = "#ff0049"; break;
                     }
                     if (isFirstTime) {
+                        $(".detail-summ>a").prop("href", $(".detail-summ>a").prop("href") + "?buffPrice=" + buff_sell_price);
                         $(".market_commodity_orders_header_promote:last").after("<small class='market_listing_price_with_fee'>" + getScale(buff_sell_price, steam_highest_buy_order_detail) + "</small>");
                         $(price_list[isLogined ? 1 : 0]).append($("<big class='good_scale' style='color: " + color + ";margin-left: 6px'>" + scale + "</big>"));
                     } else {
+                        $(".detail-summ>a").prop("href", $(".detail-summ>a").prop("href").replace(/\d{0,6}[.]?\d{0,2}$/,buff_sell_price));
                         $(".good_scale").text(scale).css("color", color);
                         $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                     }

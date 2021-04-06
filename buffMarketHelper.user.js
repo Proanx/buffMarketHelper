@@ -274,6 +274,7 @@
             }
         });
         pm.catch(e => { }).finally(function onFulfilled() {
+            $(".list_tb_csgo>tr>th:nth-child(5)").after('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
             steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny);
             for (let i = 0; i < items.length; i++) {
                 let buff_sell_price = items[i].price;
@@ -297,7 +298,7 @@
                         $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                     }
                 }
-                $(price_list[i + (isLogined ? 2 : 1)]).after($("<b class='seller_scale'>" + scale + "</b>").css("padding-left","7px"));
+               $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after('<td class="t_Left"><div style="display: table-cell;"><b class="seller_scale">' + scale + '</b></div></td>');
             }
             $("#market-selling-list").addClass("calculated");
         });

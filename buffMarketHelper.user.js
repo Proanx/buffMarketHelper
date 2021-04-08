@@ -46,6 +46,7 @@
 
     const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
     const steanOrderNumberTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
+    const steanOrderNumberErrorTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;color:#e45302 !important\"></span>";
     var steam_lowest_sell_order_detail = 0;            // 商品详情页专用-steam最低出售价
     var steam_highest_buy_order_detail = 0;            // 商品详情页专用-steam最高求购价
     var itemCount = 0;
@@ -371,7 +372,7 @@
                         err.statusText = "无法访问steam";
                         break;
                 }
-                $(target).after($(steanOrderNumberTemp).text(err.statusText));
+                $(target).after($(steanOrderNumberErrorTemp).text(err.statusText));
             }).finally(() => {
                 let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
                 let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);

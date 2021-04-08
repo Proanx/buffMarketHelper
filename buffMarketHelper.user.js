@@ -138,6 +138,7 @@
                 GM_xmlhttpRequest({
                     url: steamLink,
                     method: "get",
+                    timeout: 2000,
                     onload: function (res) {
                         if (res.status == 200) {
                             let html = res.response;
@@ -155,6 +156,10 @@
                     },
                     onerror: function (err) {
                         reject(err);
+                    },
+                    ontimeout: function () {
+                        let err = { "status": 408, "statusText": "无法访问steam" };
+                        reject(err);
                     }
                 });
             } else {
@@ -169,6 +174,7 @@
                 GM_xmlhttpRequest({
                     url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=23&item_nameid=" + steam_item_id + "&two_factor=0",
                     method: "get",
+                    timeout: 3000,
                     onload: function (res) {
                         if (res.status == 200) {
                             resolve(JSON.parse(res.response));
@@ -179,6 +185,10 @@
                     },
                     onerror: function (err) {
                         console.log("访问steamorder列表出错：", err);
+                        reject(err);
+                    },
+                    ontimeout: function () {
+                        let err = { "status": 408, "statusText": "无法访问steam" };
                         reject(err);
                     }
                 });
@@ -203,7 +213,8 @@
         }).parent().css("cursor", "pointer");
     }
 
-    function updateProgressBar(bar, progress, option) {
+    function updateProgressBar(ID, progress, option) {
+        let bar = $("#helper-progress-bar-" + ID);
         if (!progress && !option) {
             bar.width(++itemCount / itemNum * 100 + "%")
         } else {
@@ -227,6 +238,7 @@
         }
         if (itemCount >= itemNum) {
             itemCount = 0;
+            $("#helper-loading-" + ID).remove();
             bar.fadeOut(500);
         }
     }
@@ -239,8 +251,9 @@
             return;
         }
         if ($("#market-selling-list").hasClass("calculated") || data.total_count == 0) { return; }
+        $(".detail-cont").append("<i class=\"icon icon_uploading helper-loading\" style='margin: 5px;'></i>");
         let price_list = $(".f_Strong");
-        let isLogined = $("#navbar-cash-amount").length==1;
+        let isLogined = $("#navbar-cash-amount").length == 1;
         let isFirstTime = $(".good_scale").length == 0;
         let steamLink = document.getElementsByClassName("detail-summ")[0].lastElementChild.href;
         let buff_item_id = getUrlParam("goods_id");
@@ -261,11 +274,12 @@
                         case 500:
                             err.statusText = "请重试";
                             break;
+                        case 408:
                         case 0:
-                            err.statusText = "连接steam失败";
+                            err.statusText = "访问steam超时，请检查steam市场连接性";
                             break;
                     }
-                    $(".detail-cont").append("<div id='steam_order'>" + err.statusText + "</div>");
+                    $(".detail-cont").append("<div id='steam_order_error'>" + err.statusText + "</div>");
                 }).finally(() => {
                     resolve();
                 });
@@ -274,6 +288,7 @@
             }
         });
         pm.catch(e => { }).finally(function onFulfilled() {
+            $(".helper-loading").remove();
             $(".list_tb_csgo>tr>th:nth-child(5)").after('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
             steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny);
             for (let i = 0; i < items.length; i++) {
@@ -294,12 +309,12 @@
                         $(".market_commodity_orders_header_promote:last").after("<small class='market_listing_price_with_fee'>" + getScale(buff_sell_price, steam_highest_buy_order_detail) + "</small>");
                         $(price_list[isLogined ? 1 : 0]).append($("<big class='good_scale' style='color: " + color + ";margin-left: 6px'>" + scale + "</big>"));
                     } else {
-                        $(".detail-summ>a").prop("href", $(".detail-summ>a").prop("href").replace(/\d{0,6}[.]?\d{0,2}$/,buff_sell_price));
+                        $(".detail-summ>a").prop("href", $(".detail-summ>a").prop("href").replace(/\d{0,6}[.]?\d{0,2}$/, buff_sell_price));
                         $(".good_scale").text(scale).css("color", color);
                         $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
                     }
                 }
-                if (scale>10) {  // 防止价格太长换行
+                if (scale > 10) {  // 防止价格太长换行
                     scale = scale > 100 ? Math.round(scale) : Math.round(scale * 10) / 10;
                 }
                 $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after('<td class="t_Left"><div style="display: table-cell;"><b class="seller_scale">' + scale + '</b></div></td>');
@@ -317,11 +332,12 @@
         }
         if ($("#j_list_card").hasClass("calculated")) { return; }
         $(".list_card li>p>span.l_Right").removeClass("l_Right").addClass("l_Left");
-        let barID = "helper-progress-bar-" + Math.round(Math.random() * 1000);
+        let randomID = Math.round(Math.random() * 1000);
         let goods = $("#j_list_card>ul>li");
         itemNum = items.length;
         // 添加进度条
-        $(".market-list .blank20").prepend($('<div id=' + barID + ' class="helper-progress-bar"></div>'));
+        $(".tab>li.on").append("<i id=helper-loading-" + randomID + " class=\"icon icon_uploading helper-loading\"></i>");
+        $(".market-list .blank20").prepend('<div id=helper-progress-bar-' + randomID + ' class="helper-progress-bar"></div>');
         for (let i = 0; i < goods.length; i++) {
             let target = $(goods[i]).find("p>strong.f_Strong")[0];
             $(goods[i]).attr("data-default-sort", i);
@@ -352,7 +368,7 @@
                         err.statusText = "请重试";
                         break;
                     case 0:
-                        err.statusText = "连接steam失败";
+                        err.statusText = "无法访问steam";
                         break;
                 }
                 $(target).after($(steanOrderNumberTemp).text(err.statusText));
@@ -370,14 +386,14 @@
                     let arr = needSort.split(".");
                     sortGoods("data-" + arr[0], arr[1] == "asc");
                 }
-                updateProgressBar($("#" + barID));
+                updateProgressBar(randomID);
             });
         }
         $("#j_list_card").addClass("calculated");
     }
 
     if (location.pathname === "/market/goods") {
-        GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
                 // 批量购买（未完成）
@@ -390,7 +406,7 @@
     } else if (location.pathname === "/market/") {
         // 样式
         GM_addStyle("#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li h3{margin: 8px 12px 9px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}");
-        GM_addStyle(".helper-progress-bar{height:20px;background:linear-gradient(90deg,rgba(38,216,141,0.75) 0,rgba(38,200,216,0.5) 70%,transparent);width:0;z-index:1000}")
+        GM_addStyle(".helper-loading{position:absolute;margin:11px}.helper-progress-bar{height:20px;background:linear-gradient(90deg,rgb(22 122 193 / 70%) 0,rgb(51 177 159 / 50%) 70%,transparent);width:0;z-index:1000}");
         addNextPageBtn();
         // 排序按钮
         $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="default">默认</li><li data-value="buff-sort.asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort.desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort.asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort.desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
@@ -441,6 +457,7 @@
         $(document).ajaxSend(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods")) {
                 $(".helper-progress-bar").remove();
+                $(".helper-loading").remove();
             }
         });
         $(document).ajaxSuccess(function (event, status, header, result) {

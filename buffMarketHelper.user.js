@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.0.8
-// @note            更新于2021年4月9日12:05:41
+// @version         2.0.9
+// @note            更新于2021年4月9日13:03:53
 // @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @copyright       2021, Pronax
@@ -51,7 +51,7 @@
     var steam_highest_buy_order_detail = 0;            // 商品详情页专用-steam最高求购价
     var itemCount = 0;
     var itemNum = 0;
-    var ajaxTimeOut = 3000;
+    var ajaxTimeOut = 5000;
     var steamConnection = true;
 
     function getUrlParam(name, url) {
@@ -155,7 +155,7 @@
                             GM_setValue(buff_item_id, steam_item_id);
                             resolve(steam_item_id);
                         } else {
-                            console.log("获取itemID状态异常：",res);
+                            console.log("获取itemID状态异常：", res);
                             reject(res);
                         }
                     },

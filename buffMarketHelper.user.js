@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.0.7
-// @note            更新于2021年4月8日18:19:25
+// @version         2.0.8
+// @note            更新于2021年4月9日12:05:41
 // @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @copyright       2021, Pronax
@@ -51,6 +51,7 @@
     var steam_highest_buy_order_detail = 0;            // 商品详情页专用-steam最高求购价
     var itemCount = 0;
     var itemNum = 0;
+    var ajaxTimeOut = 3000;
 
     function getUrlParam(name, url) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -139,7 +140,7 @@
                 GM_xmlhttpRequest({
                     url: steamLink,
                     method: "get",
-                    timeout: 2000,
+                    timeout: ajaxTimeOut,
                     onload: function (res) {
                         if (res.status == 200) {
                             let html = res.response;
@@ -175,7 +176,7 @@
                 GM_xmlhttpRequest({
                     url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=23&item_nameid=" + steam_item_id + "&two_factor=0",
                     method: "get",
-                    timeout: 3000,
+                    timeout: ajaxTimeOut,
                     onload: function (res) {
                         if (res.status == 200) {
                             resolve(JSON.parse(res.response));

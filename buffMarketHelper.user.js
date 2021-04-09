@@ -52,6 +52,7 @@
     var itemCount = 0;
     var itemNum = 0;
     var ajaxTimeOut = 3000;
+    var steamConnection = true;
 
     function getUrlParam(name, url) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -148,11 +149,13 @@
                             let end = html.indexOf(" );	// initial load");
                             if (start == 24 || end == -1) {
                                 reject({ status: 404, statusText: "物品不在货架上" });
+                                return;
                             }
                             steam_item_id = html.slice(start, end);
                             GM_setValue(buff_item_id, steam_item_id);
                             resolve(steam_item_id);
                         } else {
+                            console.log("获取itemID状态异常：",res);
                             reject(res);
                         }
                     },
@@ -160,6 +163,7 @@
                         reject(err);
                     },
                     ontimeout: function () {
+                        steamConnection = false;
                         let err = { "status": 408, "statusText": "无法访问steam" };
                         reject(err);
                     }
@@ -172,6 +176,11 @@
 
     function getSteamOrderList(buff_item_id, steamLink) {
         return new Promise(function (resolve, reject) {
+            if (!steamConnection) {
+                let err = { "status": 408, "statusText": "无法访问steam" };
+                reject(err);
+                return;
+            }
             getItemId(buff_item_id, steamLink).then(function onFulfilled(steam_item_id) {
                 GM_xmlhttpRequest({
                     url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=23&item_nameid=" + steam_item_id + "&two_factor=0",
@@ -181,7 +190,7 @@
                         if (res.status == 200) {
                             resolve(JSON.parse(res.response));
                         } else {
-                            console.log("访问steamorder列表出错：", res);
+                            console.log("访问steamorder状态异常：", res);
                             reject(res);
                         }
                     },
@@ -190,6 +199,7 @@
                         reject(err);
                     },
                     ontimeout: function () {
+                        steamConnection = false;
                         let err = { "status": 408, "statusText": "无法访问steam" };
                         reject(err);
                     }
@@ -278,6 +288,7 @@
                             break;
                         case 408:
                         case 0:
+                            steamConnection = false;
                             err.statusText = "访问steam超时，请检查steam市场连接性";
                             break;
                     }
@@ -370,6 +381,7 @@
                         err.statusText = "请重试";
                         break;
                     case 0:
+                        steamConnection = false;
                         err.statusText = "无法访问steam";
                         break;
                 }

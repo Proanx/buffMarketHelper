@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.0.9
-// @note            更新于2021年4月9日13:03:53
+// @version         2.0.12
+// @note            更新于2021年4月10日23:12:41
 // @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @copyright       2021, Pronax
@@ -17,12 +17,19 @@
 // @grant           GM_addStyle
 // @grant           GM_setValue
 // @grant           GM_getValue
+// @grant           GM_info
+// @grant           GM_registerMenuCommand
 // ==/UserScript==
 
 (function () {
 
     'use strict';
-
+    unsafeWindow.infoGM = GM_info;
+    unsafeWindow.helper_config = {};
+    // 设置界面
+    GM_addStyle(".helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:40px 54px;top:25%}.helper-setting td>span:first-child,.w-Checkbox>span:first-child{margin:0!important}.helper-setting .list_tb span{margin-left:12px}");
+    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left"><span class="c_Green"><i class="icon icon_status_success"></i>正常</span></td><td class="t_Right"><a href="javascript:console.log(\'检测steam连接性\');" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray">贴纸顺序倒置</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">使用buff排序时重置比例排序为默认</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort.asc">按buff比例从低到高</li><li value="buff-sort.desc">按buff比例从高到低</li><li value="order-sort.asc">按求购比例从低到高</li><li value="order-sort.desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">请求超时时间 <i class="icon icon_qa j_tips_handler" data-title="关于超时时间：" data-content="默认值为5000<br/>如果你可以访问steam市场但是却经常提示你无法连接到steam时，你应该增大这个值。" data-direction="right"></i></td><td class="t_Left" style="position: relative;"><span><input type="number" name="steam_ajax_timeout" class="i_Text" min="1000" max="60000" value="5000"></span><span class="c_DGray">毫秒</span></td><td class="t_Right"></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">问题反馈QQ群：544144372</a></td></tr></tbody></table></div></div>');
+    
     // 	-------------------------------------------------------自定义参数--------start--------------------------------------
     // 比例取值最小范围，小于等于这个值的比例会直接渲染成最小值渐变色
     const min_range = 0.63;
@@ -38,6 +45,12 @@
     //  buff-sort.asc     buff-sort.desc        order-sort.asc   order-sort.desc
     // 示例: var needSort = buff-sort.asc;
     var needSort = GM_getValue("sortRule");
+
+    // 请求超时时间 （毫秒）
+    var ajaxTimeOut = 5000;
+    // steam连接性
+    var steamConnection = true;
+
     // 	-------------------------------------------------------自定义参数--------end---------------------------------------
 
     // 处理成数组
@@ -51,8 +64,6 @@
     var steam_highest_buy_order_detail = 0;            // 商品详情页专用-steam最高求购价
     var itemCount = 0;
     var itemNum = 0;
-    var ajaxTimeOut = 5000;
-    var steamConnection = true;
 
     function getUrlParam(name, url) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -145,13 +156,12 @@
                     onload: function (res) {
                         if (res.status == 200) {
                             let html = res.response;
-                            let start = html.indexOf("Market_LoadOrderSpread( ") + 24;
-                            let end = html.indexOf(" );	// initial load");
-                            if (start == 24 || end == -1) {
+                            try {
+                                steam_item_id = html.match(/(?<=Market_LoadOrderSpread\(\s)\d+(?=\s\);)/)[0];
+                            } catch (error) {
                                 reject({ status: 404, statusText: "物品不在货架上" });
                                 return;
                             }
-                            steam_item_id = html.slice(start, end);
                             GM_setValue(buff_item_id, steam_item_id);
                             resolve(steam_item_id);
                         } else {
@@ -211,14 +221,27 @@
         });
     }
 
-    function addNextPageBtn() {
+    function addHelperBtn() {
         if ($(".floatbar>ul").length == 0) {
-            setTimeout(() => { addNextPageBtn(); }, 100);
+            setTimeout(() => { addHelperBtn(); }, 100);
             return;
         }
         if ($("#buff_tool_nextpage").length != 0) { return; }
+        // 设置按钮
+        $(".floatbar>ul").prepend("<li><a id='buff_tool_setting'><i class='icon icon_menu_setting'></i><p>设置</p></a></li>");
+        $("#buff_tool_setting").click(function () {
+            $(".helper-setting-shadow").css({
+                "opacity":0,
+                "display":"flex"
+            }).animate({opacity:'1'},300);
+        }).parent().css("cursor", "pointer");
+        $(".helper-setting-shadow").click(function(e){
+            if(e.target==this){
+                $(this).fadeOut();
+            }
+        });
         // 下一页按钮
-        $(".floatbar>ul").prepend("<li><a id='buff_tool_nextpage'><i class='icon icon_comment_arr' style='transform: rotate(90deg); width: 1.125rem; height: 1.125rem; left: 0.25rem; position: relative;'></i><p style='color:#fff;'>下一页</p></a></li>");
+        $(".floatbar>ul").prepend("<li><a id='buff_tool_nextpage'><i class='icon icon_slide_right2' style='height: 40px;width: 39px;'></i><p>下一页</p></a></li>");
         $("#buff_tool_nextpage").click(function () {
             $(".page-link.next").click();
             $("#sort_scale").removeClass();
@@ -421,7 +444,7 @@
         // 样式
         GM_addStyle("#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li h3{margin: 8px 12px 9px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}");
         GM_addStyle(".helper-loading{position:absolute;margin:11px}.helper-progress-bar{height:20px;background:linear-gradient(90deg,rgb(22 122 193 / 70%) 0,rgb(51 177 159 / 50%) 70%,transparent);width:0;z-index:1000}");
-        addNextPageBtn();
+        addHelperBtn();
         // 排序按钮
         $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="default">默认</li><li data-value="buff-sort.asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort.desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort.asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort.desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
         if (needSort) {

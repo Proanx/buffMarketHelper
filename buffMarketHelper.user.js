@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name            网易BUFF价格比例(找挂刀)插件
-// @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
-// @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.3
-// @note            更新于2021年4月11日23:24:10
-// @author          Pronax
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
+// @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
+// @version         2.1.5
+// @note            更新于2021年4月13日16:59:04
+// @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 // @feedback-url    https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 // @license         AGPL-3.0
 // @match           https://buff.163.com/market/goods*
 // @match           https://buff.163.com/market/?game=*
+// @icon            https://gitee.com/pronax/buffMarketHelper/raw/feature/Wingman.png
 // @run-at          document-body
 // @grant           GM_xmlhttpRequest
 // @grant           GM_addStyle
@@ -28,9 +28,11 @@
     const steanOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
     const steanOrderNumberTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;\"></span>";
     const steanOrderNumberErrorTemp = "<span class=\"f_12px c_Gray f_Bold l_Right\" style=\"margin-top: inherit;color:#e45302 !important\"></span>";
+    const g_rgCurrencyData = { "USD": { "strCode": "USD", "eCurrencyCode": 1, "strSymbol": "$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "GBP": { "strCode": "GBP", "eCurrencyCode": 2, "strSymbol": "\u00a3", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "EUR": { "strCode": "EUR", "eCurrencyCode": 3, "strSymbol": "\u20ac", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "CHF": { "strCode": "CHF", "eCurrencyCode": 4, "strSymbol": "CHF", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " }, "RUB": { "strCode": "RUB", "eCurrencyCode": 5, "strSymbol": "p\u0443\u0431.", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": "", "strSymbolAndNumberSeparator": " " }, "BRL": { "strCode": "BRL", "eCurrencyCode": 7, "strSymbol": "R$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "JPY": { "strCode": "JPY", "eCurrencyCode": 8, "strSymbol": "\u00a5", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "NOK": { "strCode": "NOK", "eCurrencyCode": 9, "strSymbol": "kr", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "IDR": { "strCode": "IDR", "eCurrencyCode": 10, "strSymbol": "Rp", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " }, "MYR": { "strCode": "MYR", "eCurrencyCode": 11, "strSymbol": "RM", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "PHP": { "strCode": "PHP", "eCurrencyCode": 12, "strSymbol": "P", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "SGD": { "strCode": "SGD", "eCurrencyCode": 13, "strSymbol": "S$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "THB": { "strCode": "THB", "eCurrencyCode": 14, "strSymbol": "\u0e3f", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "VND": { "strCode": "VND", "eCurrencyCode": 15, "strSymbol": "\u20ab", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "KRW": { "strCode": "KRW", "eCurrencyCode": 16, "strSymbol": "\u20a9", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "TRY": { "strCode": "TRY", "eCurrencyCode": 17, "strSymbol": "TL", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "UAH": { "strCode": "UAH", "eCurrencyCode": 18, "strSymbol": "\u20b4", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "MXN": { "strCode": "MXN", "eCurrencyCode": 19, "strSymbol": "Mex$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "CAD": { "strCode": "CAD", "eCurrencyCode": 20, "strSymbol": "CDN$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "AUD": { "strCode": "AUD", "eCurrencyCode": 21, "strSymbol": "A$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "NZD": { "strCode": "NZD", "eCurrencyCode": 22, "strSymbol": "NZ$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "PLN": { "strCode": "PLN", "eCurrencyCode": 6, "strSymbol": "z\u0142", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "CNY": { "strCode": "CNY", "eCurrencyCode": 23, "strSymbol": "\u00a5", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "INR": { "strCode": "INR", "eCurrencyCode": 24, "strSymbol": "\u20b9", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "CLP": { "strCode": "CLP", "eCurrencyCode": 25, "strSymbol": "CLP$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "PEN": { "strCode": "PEN", "eCurrencyCode": 26, "strSymbol": "S\/.", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "COP": { "strCode": "COP", "eCurrencyCode": 27, "strSymbol": "COL$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "ZAR": { "strCode": "ZAR", "eCurrencyCode": 28, "strSymbol": "R", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " }, "HKD": { "strCode": "HKD", "eCurrencyCode": 29, "strSymbol": "HK$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "TWD": { "strCode": "TWD", "eCurrencyCode": 30, "strSymbol": "NT$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "SAR": { "strCode": "SAR", "eCurrencyCode": 31, "strSymbol": "SR", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "AED": { "strCode": "AED", "eCurrencyCode": 32, "strSymbol": "AED", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "SEK": { "strCode": "SEK", "eCurrencyCode": 33, "strSymbol": "kr", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "ARS": { "strCode": "ARS", "eCurrencyCode": 34, "strSymbol": "ARS$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "ILS": { "strCode": "ILS", "eCurrencyCode": 35, "strSymbol": "\u20aa", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "BYN": { "strCode": "BYN", "eCurrencyCode": 36, "strSymbol": "Br", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "KZT": { "strCode": "KZT", "eCurrencyCode": 37, "strSymbol": "\u20b8", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "KWD": { "strCode": "KWD", "eCurrencyCode": 38, "strSymbol": "KD", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "QAR": { "strCode": "QAR", "eCurrencyCode": 39, "strSymbol": "QR", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "CRC": { "strCode": "CRC", "eCurrencyCode": 40, "strSymbol": "\u20a1", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "UYU": { "strCode": "UYU", "eCurrencyCode": 41, "strSymbol": "$U", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "BGN": { "strCode": "BGN", "eCurrencyCode": 42, "strSymbol": "\u043b\u0432", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "HRK": { "strCode": "HRK", "eCurrencyCode": 43, "strSymbol": "kn", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "CZK": { "strCode": "CZK", "eCurrencyCode": 44, "strSymbol": "K\u010d", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "DKK": { "strCode": "DKK", "eCurrencyCode": 45, "strSymbol": "kr.", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "HUF": { "strCode": "HUF", "eCurrencyCode": 46, "strSymbol": "Ft", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "RON": { "strCode": "RON", "eCurrencyCode": 47, "strSymbol": "lei", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "RMB": { "strCode": "RMB", "eCurrencyCode": 9000, "strSymbol": "\u5200\u5e01", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": "", "strSymbolAndNumberSeparator": " " }, "NXP": { "strCode": "NXP", "eCurrencyCode": 9001, "strSymbol": "\uc6d0", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" } };
     var steam_lowest_sell_order_detail = 0;     // 商品详情页专用-steam最低出售价
     var steam_highest_buy_order_detail = 0;     // 商品详情页专用-steam最高求购价
     var steamConnection = undefined;            // steam连接性
+    var displayCurrency = g_rgCurrencyData[getDisplayCurrency()];
     var itemCount = 0;
     var itemNum = 0;
     var needSort;
@@ -47,6 +49,16 @@
             minRange: 0.63,
             marketColorHigh: "#5027ff",
             marketColorLow: "#ff1e1e",
+            steamCurrency: {
+                "strCode": "CNY",
+                "eCurrencyCode": 23,
+                "strSymbol": "¥",
+                "bSymbolIsPrefix": true,
+                "bWholeUnitsOnly": true,
+                "strDecimalSymbol": ".",
+                "strThousandsSeparator": ",",
+                "strSymbolAndNumberSeparator": " "
+            }
         };
     }
     // 设置界面
@@ -79,6 +91,16 @@
             "opacity": 0,
             "display": "flex"
         }).animate({ opacity: '1' }, 300);
+    }
+
+    function getDisplayCurrency() {
+        let currencyList = { "/¥/": "CNY", "/\\$/": "USD", "/€/": "EUR", "/₽/": "RUB" };
+        let text = $(".w-Counter-input").text();
+        for (let key in currencyList) {
+            if (eval(key).test(text)) {
+                return currencyList[key];
+            }
+        }
     }
 
     function parseColor() {
@@ -131,7 +153,7 @@
             }
         }
     }
-    
+
     function init() {
         updateSteamStatus();
         if (helper_config.reverseSticker) {
@@ -170,6 +192,46 @@
         }).parent().css("cursor", "pointer");
     }
 
+    function checkSteamConnection() {
+        $(".helper-setting-steamConnection").html("<span class=\"c_Blue\"><i class=\"icon icon_status_progressing\"></i>检测中</span>");
+        $("#helper-setting-checkBtn").css("visibility", "hidden");
+        let startTime = new Date().getTime();
+        let endTime = 0;
+        steamConnection = undefined;
+        GM_xmlhttpRequest({
+            url: "https://steamcommunity.com/market/",
+            method: "get",
+            timeout: helper_config.ajaxTimeOut,
+            onload: function (res) {
+                if (res && res.status == 200) {
+                    endTime = new Date().getTime();
+                    changeSteamStatus(true);
+                } else {
+                    console.log("检测steam连接性出错：状态错误", res);
+                    changeSteamStatus(false);
+                }
+            },
+            onerror: function (err) {
+                console.log("检测steam连接性出错：连接错误", err);
+                changeSteamStatus(false);
+            },
+            ontimeout: function () {
+                console.log("检测steam连接性出错：尝试超时");
+                changeSteamStatus(false);
+            }
+        });
+
+        function changeSteamStatus(status) {
+            steamConnection = status;
+            if (status) {
+                $(".helper-setting-steamConnection").html("<span class=\"c_Green\"><i class=\"icon icon_status_success\"></i>正常</span><span class=\"c_DGray f_12px\">" + (endTime - startTime) + "ms</span>");
+            } else {
+                $(".helper-setting-steamConnection").html("<span class=\"c_DRed\"><i class=\"icon icon_status_failed\"></i>无法连接</span>");
+            }
+            $("#helper-setting-checkBtn").css("visibility", "visible");
+        }
+    }
+
     // 泛用方法
 
     // 保留2位小数
@@ -185,6 +247,16 @@
         return roundToTwo(originPrice / (withFeePrice / 1.15));
     }
 
+    function gradient(max, min, f) {
+        if (f == "∞") { return min; }
+        if (f >= helper_config.maxRange || f <= helper_config.minRange) {
+            f = f >= helper_config.maxRange ? 1 : 0;
+        } else {
+            f = (f - helper_config.minRange) / (helper_config.maxRange - helper_config.minRange);
+        }
+        return max >= min ? f * (max - min) + min : (1 - f) * (min - max) + max;
+    }
+
     function getUrlParam(name, url) {
         let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
         let result;
@@ -194,21 +266,6 @@
             result = window.location.search.substr(1).match(reg);  //匹配目标参数
         }
         if (result != null) return unescape(result[2]); return null; //返回参数值
-    }
-
-    function gradient(max, min, f) {
-        if (typeof max === "string") {
-            max *= 1;
-        }
-        if (typeof min === "string") {
-            min *= 1;
-        }
-        if (f >= helper_config.maxRange || f <= helper_config.minRange) {
-            f = f >= helper_config.maxRange ? 1 : 0;
-        } else {
-            f = (f - helper_config.minRange) / (helper_config.maxRange - helper_config.minRange);
-        }
-        return max >= min ? f * (max - min) + min : (1 - f) * (min - max) + max;
     }
 
     function updateProgressBar(ID, progress, option) {
@@ -318,7 +375,7 @@
             }
             getItemId(buff_item_id, steamLink).then(function onFulfilled(steam_item_id) {
                 GM_xmlhttpRequest({
-                    url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=23&item_nameid=" + steam_item_id + "&two_factor=0",
+                    url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=" + helper_config.steamCurrency.eCurrencyCode + "&item_nameid=" + steam_item_id + "&two_factor=0",
                     method: "get",
                     timeout: helper_config.ajaxTimeOut,
                     onload: function (res) {
@@ -345,46 +402,6 @@
                 reject(err);
             });
         });
-    }
-
-    function checkSteamConnection() {
-        $(".helper-setting-steamConnection").html("<span class=\"c_Blue\"><i class=\"icon icon_status_progressing\"></i>检测中</span>");
-        $("#helper-setting-checkBtn").css("visibility", "hidden");
-        let startTime = new Date().getTime();
-        let endTime = 0;
-        steamConnection = undefined;
-        GM_xmlhttpRequest({
-            url: "https://steamcommunity.com/market/",
-            method: "get",
-            timeout: helper_config.ajaxTimeOut,
-            onload: function (res) {
-                if (res && res.status == 200) {
-                    endTime = new Date().getTime();
-                    changeSteamStatus(true);
-                } else {
-                    console.log("检测steam连接性出错：状态错误", res);
-                    changeSteamStatus(false);
-                }
-            },
-            onerror: function (err) {
-                console.log("检测steam连接性出错：连接错误", err);
-                changeSteamStatus(false);
-            },
-            ontimeout: function () {
-                console.log("检测steam连接性出错：尝试超时");
-                changeSteamStatus(false);
-            }
-        });
-
-        function changeSteamStatus(status) {
-            steamConnection = status;
-            if (status) {
-                $(".helper-setting-steamConnection").html("<span class=\"c_Green\"><i class=\"icon icon_status_success\"></i>正常</span><span class=\"c_DGray f_12px\">" + (endTime - startTime) + "ms</span>");
-            } else {
-                $(".helper-setting-steamConnection").html("<span class=\"c_DRed\"><i class=\"icon icon_status_failed\"></i>无法连接</span>");
-            }
-            $("#helper-setting-checkBtn").css("visibility", "visible");
-        }
     }
 
     // 商品详情
@@ -437,10 +454,12 @@
             $(".helper-loading").remove();
             $(".list_tb_csgo>tr>th:nth-child(5)").after('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
             steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny);
-            console.log(steam_lowest_sell_order_detail,steam_price_cny);
             for (let i = 0; i < items.length; i++) {
                 let buff_sell_price = items[i].price;
                 let scale = roundToTwo(buff_sell_price / steam_price_without_fee);
+                if (scale === Infinity) {
+                    scale = "∞";
+                }
                 if (!i) {
                     $(".f_Strong .hide-usd")[0].innerText = steam_price_without_fee;
                     let color;
@@ -522,11 +541,18 @@
                 }
                 $(target).after($(steanOrderNumberErrorTemp).text(err.statusText));
             }).finally(() => {
-                let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
-                let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny);
+                let lowest_sell_price = steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny;
+                let withoutFeePrice = getWithoutFeePrice(lowest_sell_price);
+                let scale = getScale(buff_sell_min_price, lowest_sell_price);
                 if (withoutFeePrice > 10000 || buff_sell_min_price > 10000) {  // 防止价格太长换行
                     withoutFeePrice = Math.round(withoutFeePrice);
                     scale = scale > 10 ? Math.round(scale) : Math.round(scale * 10) / 10;
+                }
+                if (withoutFeePrice == 0 || (displayCurrency.eCurrencyCode == 5 && withoutFeePrice >= 100)) {
+                    withoutFeePrice = "";
+                }
+                if (scale === Infinity) {
+                    scale = "∞";
                 }
                 $(goods[i]).attr("data-buff-sort", scale);
                 $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
@@ -585,8 +611,8 @@
         });
         // 设置初始化
         init();
-        // 修改buff排序时重置比例排序规则
         setTimeout(() => {
+            // 修改buff排序时重置比例排序规则
             $("div[name='sort_by']").change(function () {
                 if (helper_config.overrideSortRule && this.getAttribute("value")) {
                     needSort = this.dataset.value;

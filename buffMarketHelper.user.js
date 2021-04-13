@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.5
-// @note            更新于2021年4月13日16:59:04
+// @version         2.1.6
+// @note            更新于2021年4月13日18:15:02
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -113,7 +113,7 @@
     }
 
     function updateSteamStatus() {
-        if (steamConnection == undefined) {
+        if (steamConnection === undefined) {
         } else if (steamConnection) {
             if (!$(".helper-setting-steamConnection>.c_Green").text()) {
                 $(".helper-setting-steamConnection").html("<span class=\"c_Green\"><i class=\"icon icon_status_success\"></i>正常</span>");
@@ -329,40 +329,43 @@
     function getItemId(buff_item_id, steamLink) {
         return new Promise(function (resolve, reject) {
             let steam_item_id = GM_getValue(buff_item_id);
-            if ((!steam_item_id) || steam_item_id.length > 20 || steam_item_id == buff_item_id) {
-                GM_xmlhttpRequest({
-                    url: steamLink,
-                    method: "get",
-                    timeout: helper_config.ajaxTimeOut,
-                    onload: function (res) {
-                        if (res.status == 200) {
-                            let html = res.response;
-                            try {
-                                steam_item_id = html.match(/(?<=Market_LoadOrderSpread\(\s)\d+(?=\s\);)/)[0];
-                            } catch (error) {
-                                steamConnection = true;
-                                reject({ status: 404, statusText: "物品不在货架上" });
-                                return;
-                            }
-                            GM_setValue(buff_item_id, steam_item_id);
-                            resolve(steam_item_id);
-                        } else {
-                            console.log("获取itemID状态异常：", res);
-                            reject(res);
-                        }
-                    },
-                    onerror: function (err) {
-                        reject(err);
-                    },
-                    ontimeout: function () {
-                        steamConnection = false;
-                        let err = { "status": 408, "statusText": "无法访问steam" };
-                        reject(err);
-                    }
-                });
-            } else {
+            if (steam_item_id) {
                 resolve(steam_item_id);
+                return;
+            } else if (steam_item_id === null) {
+                reject({ status: 404, statusText: "物品不在货架上" });
             }
+            GM_xmlhttpRequest({
+                url: steamLink,
+                method: "get",
+                timeout: helper_config.ajaxTimeOut,
+                onload: function (res) {
+                    if (res.status == 200) {
+                        let html = res.response;
+                        try {
+                            steam_item_id = html.match(/(?<=Market_LoadOrderSpread\(\s)\d+(?=\s\);)/)[0];
+                        } catch (error) {
+                            steamConnection = true;
+                            GM_setValue(buff_item_id, null);
+                            reject({ status: 404, statusText: "物品不在货架上" });
+                            return;
+                        }
+                        GM_setValue(buff_item_id, steam_item_id);
+                        resolve(steam_item_id);
+                    } else {
+                        console.log("获取itemID状态异常：", res);
+                        reject(res);
+                    }
+                },
+                onerror: function (err) {
+                    reject(err);
+                },
+                ontimeout: function () {
+                    steamConnection = false;
+                    let err = { "status": 408, "statusText": "无法访问steam" };
+                    reject(err);
+                }
+            });
         });
     }
 

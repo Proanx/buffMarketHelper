@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name            网易BUFF价格比例(找挂刀)插件
-// @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
+// @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.11
-// @note            更新于2021年4月15日19:08:04
+// @version         2.1.12
+// @note            更新于2021年4月15日21:59:42
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -33,8 +33,8 @@
     var steam_lowest_sell_order_detail = 0;     // 商品详情页专用-steam最低出售价
     var steam_highest_buy_order_detail = 0;     // 商品详情页专用-steam最高求购价
     var helper_config = loadConfig();
-    var displayCurrency = g_rgCurrencyData[getDisplayCurrency()];
-    var steamCurrency = g_rgCurrencyData[helper_config.steamCurrency];
+    var displayCurrency = getDisplayCurrency();
+    var steamCurrency;
     var steamConnection = undefined;
     var steamFailedTimes = 0;
     var market_color_high = [];
@@ -85,11 +85,11 @@
     }
 
     function syncCurrency() {
-        steamCurrency = g_rgCurrencyData[helper_config.steamCurrency];
+        steamCurrency = g_rgCurrencyData[helper_config.steamCurrency.strCode];
         $("#helper-setting-currencyDisplayMode").attr("value", helper_config.currencyDisplayMode);
         $("#helper-setting-currencyDisplayMode>h3").text($("#helper-setting-currencyDisplayMode li[value=" + helper_config.currencyDisplayMode + "]").addClass("on").text());
         $("#helper-setting-currency").attr("value", steamCurrency.strCode);
-        $("#helper-setting-currency>h3").text($("#helper-setting-currency li[value=" + helper_config.steamCurrency + "]").addClass("on").text());
+        $("#helper-setting-currency>h3").text($("#helper-setting-currency li[value=" + steamCurrency.strCode + "]").addClass("on").text());
     }
 
     function openSettingPanel() {
@@ -105,7 +105,7 @@
         let text = $(".w-Counter-input").text();
         for (let key in currencyList) {
             if (eval(key).test(text)) {
-                return currencyList[key];
+                return g_rgCurrencyData[currencyList[key]];
             }
         }
     }

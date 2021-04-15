@@ -119,9 +119,10 @@
     }
 
     function failedSteamConnection() {
-        if (++steamFailedTimes > (itemNum >> 1)) {
+        if (++steamFailedTimes > (itemNum >> 2)) {
             steamConnection = false;
         }
+        console.log("？",steamFailedTimes);
     }
 
     function updateSteamStatus() {
@@ -497,20 +498,19 @@
             let lowest_sell_price = steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny;
             let withoutFeePrice = getWithoutFeePrice(lowest_sell_price);
             let scale = getScale(buff_sell_min_price, lowest_sell_price);
+            $(good).attr("data-buff-sort", scale);
             if (withoutFeePrice > 10000 || buff_sell_min_price > 10000) {  // 防止价格太长换行
                 withoutFeePrice = Math.round(withoutFeePrice);
                 scale = scale > 10 ? Math.round(scale) : Math.round(scale * 10) / 10;
             }
-            if (withoutFeePrice == 0 || (displayCurrency.eCurrencyCode == 5 && withoutFeePrice >= 1000)) {
-                withoutFeePrice = "";
-            }
-            $(good).attr("data-buff-sort", scale);
             if (scale === Infinity) {
+                withoutFeePrice = "";
                 scale = "∞";
             }
-            $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
+            if(displayCurrency.eCurrencyCode!=5){
+                $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
+            }
             paintingGradient(scale, target, 3);
-            helper_config.sortAfterAllDone
             if (needSort && (helper_config.sortAfterAllDone ? itemCount == itemNum - 1 : true)) {
                 let arr = needSort.split("_");
                 sortGoods("data-" + arr[0], arr[1] == "asc");

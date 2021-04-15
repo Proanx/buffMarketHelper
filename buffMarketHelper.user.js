@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @namespace       https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.7
-// @note            更新于2021年4月14日00:02:48
+// @version         2.1.9
+// @note            更新于2021年4月15日13:06:28
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -35,6 +35,7 @@
     var displayCurrency = g_rgCurrencyData[getDisplayCurrency()];
     var steamCurrency = g_rgCurrencyData[helper_config.steamCurrency];
     var steamConnection = undefined;
+    var steamFailedTimes = 0;
     var market_color_high = [];
     var market_color_low = [];
     var itemCount = 0;
@@ -42,8 +43,8 @@
     var needSort;
 
     // 设置界面
-    GM_addStyle(".helper-setting input[type=number]{max-width:70px}input[type=\"number\"]{-moz-appearance:textfield}.helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:40px 54px;top:25%}.helper-setting td>span:first-child,.w-Checkbox>span:first-child{margin:0!important}.helper-setting .list_tb span{margin-left:12px}.helper-setting .icon_status_progressing{animation:rotate-L 1.5s linear infinite;-webkit-animation:rotate-L 1.5s linear infinite}");
-    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray" width="120">使用buff排序时重置比例排序为默认</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">steam参考货币 <i class="icon icon_qa j_tips_handler" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Right"><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr><tr><td class="t_Left c_Gray">请求超时时间 <i class="icon icon_qa j_tips_handler" data-title="关于超时时间：" data-content="默认值为10000（10秒）<br/>如果你可以访问steam市场但是却经常提示你无法连接到steam时，你应该增大这个值。" data-direction="right"></i></td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-ajaxTimeout" data-option-target="ajaxTimeOut" class="i_Text helper-setting-option" min="1000" max="60000" step="100"></span><span class="c_DGray">ms</span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色（市场）</td><td class="t_Left" style="position: relative;"><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td><td class="t_Right"><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色<br/>渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色" data-direction="bottom"></i><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值 </td><td class="t_Left" style="position: relative;"><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td><td class="t_Right"><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色<br/>比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色" data-direction="bottom"></i><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">问题反馈QQ群：544144372</a></td></tr></tbody></table></div></div>');
+    GM_addStyle(".helper-setting input[type=number]{max-width:70px}input[type=\"number\"]{-moz-appearance:textfield}.helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:40px 54px;top:25%}.w-Checkbox.helper-setting-option>span:first-child{margin:0!important;font-size:14px}.helper-setting-steamConnection i.icon{margin-left:0!important}.helper-setting .list_tb span,.helper-setting .list_tb i.icon{margin-left:12px}.helper-setting .icon_status_progressing{animation:rotate-L 1.5s linear infinite;-webkit-animation:rotate-L 1.5s linear infinite}");
+    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序（比如当你按价格排序时）比例排序规则重置为默认，不再按比例排序（刷新页面后会恢复保存的规则）" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="选择排序时机是否是在所有饰品信息都加载完成后进行排序" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">steam参考货币 </td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Center"><i class="icon icon_qa j_tips_handler" style="margin-left: 0;" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误。默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr><tr><td class="t_Left c_Gray">请求超时时间 <i class="icon icon_qa j_tips_handler" data-title="关于超时时间：" data-content="默认值为10000（10秒）<br/>如果你可以访问steam市场但是却经常提示你无法连接到steam时，你应该增大这个值。" data-direction="right"></i></td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-ajaxTimeout" data-option-target="ajaxTimeOut" class="i_Text helper-setting-option" min="1000" max="60000" step="100"></span><span class="c_DGray">ms</span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色（市场）</td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色<br/>渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值 </td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色<br/>比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">问题反馈QQ群：544144372</a></td></tr></tbody></table></div></div>');
     initCurrency();
     $("#helper-version").text($("#helper-version").text() + GM_info.script.version);
     $("#helper-setting-checkBtn").click(() => { checkSteamConnection() });
@@ -67,7 +68,6 @@
         openSettingPanel();
     });
 
-    // 专用方法
 
     function initCurrency() {
         let list = $(".steam-currency-selector>li");
@@ -118,6 +118,12 @@
         }
     }
 
+    function failedSteamConnection() {
+        if (++steamFailedTimes > (itemNum >> 1)) {
+            steamConnection = false;
+        }
+    }
+
     function updateSteamStatus() {
         if (steamConnection === undefined) {
         } else if (steamConnection) {
@@ -133,12 +139,13 @@
         $("#j_list_card>ul>li").sort(function (a, b) {
             let av = $(a).attr(sortRule) - 0;
             let bv = $(b).attr(sortRule) - 0;
-            if (av > bv) {
-                return isAsc ? 1 : -1;
-            } else if (av < bv) {
-                return isAsc ? -1 : 1;
+            let result = 0;
+            if (isAsc) {
+                result = av - bv;
+            } else {
+                result = bv - av;
             }
-            return 0;
+            return result === NaN ? 0 : result;
         }).appendTo("#j_list_card>ul");
     }
 
@@ -148,14 +155,15 @@
             return config;
         }
         return {
-            reverseSticker: false,
-            ajaxTimeOut: 10000,
-            overrideSortRule: false,
-            needSort: null,
             maxRange: 1,
             minRange: 0.63,
-            marketColorHigh: "#5027ff",
+            needSort: null,
+            ajaxTimeOut: 10000,
+            // reverseSticker: false,
+            overrideSortRule: false,
+            sortAfterAllDone: true,
             marketColorLow: "#ff1e1e",
+            marketColorHigh: "#5027ff",
             steamCurrency: g_rgCurrencyData["CNY"],
             currencyDisplayMode: "strCode"
         };
@@ -168,20 +176,23 @@
     }
 
     function init() {
-        if (helper_config.reverseSticker) {
-            $("#helper-setting-reverseSticker").attr("value", helper_config.reverseSticker).children(":first").addClass("on");
-        }
+        // if (helper_config.reverseSticker) {
+        //     $("#helper-setting-reverseSticker").attr("value", helper_config.reverseSticker).children(":first").addClass("on");
+        // }
         if (helper_config.overrideSortRule) {
             $("#helper-setting-stickerSort").attr("value", helper_config.overrideSortRule).children(":first").addClass("on");
+        }
+        if (helper_config.sortAfterAllDone) {
+            $("#helper-setting-sortAfterAllDone").attr("value", helper_config.sortAfterAllDone).children(":first").addClass("on");
         }
         if (helper_config.needSort) {
             syncSort();
         }
-        $("#helper-setting-ajaxTimeout").val(helper_config.ajaxTimeOut);
         $("#helper-setting-maxRange").val(helper_config.maxRange);
         $("#helper-setting-minRange").val(helper_config.minRange);
-        $("#helper-setting-marketColorHigh").val(helper_config.marketColorHigh);
+        $("#helper-setting-ajaxTimeout").val(helper_config.ajaxTimeOut);
         $("#helper-setting-marketColorLow").val(helper_config.marketColorLow);
+        $("#helper-setting-marketColorHigh").val(helper_config.marketColorHigh);
         updateSteamStatus();
         syncCurrency();
         parseColor();
@@ -246,7 +257,6 @@
         }
     }
 
-    // 泛用方法
 
     // 保留2位小数
     function roundToTwo(num) {
@@ -262,7 +272,7 @@
     }
 
     function gradient(max, min, f) {
-        if (f == "∞") { return min; }
+        if (f == "∞") { return max; }
         if (f >= helper_config.maxRange || f <= helper_config.minRange) {
             f = f >= helper_config.maxRange ? 1 : 0;
         } else {
@@ -361,7 +371,10 @@
                         } catch (error) {
                             steamConnection = true;
                             GM_setValue(buff_item_id, null);
-                            reject({ status: 404, statusText: "物品不在货架上" });
+                            res.status = 404;
+                            res.statusText = "物品不在货架上";
+                            console.log("获取itemID状态异常：", res);
+                            reject(res);
                             return;
                         }
                         GM_setValue(buff_item_id, steam_item_id);
@@ -372,11 +385,13 @@
                     }
                 },
                 onerror: function (err) {
+                    console.log("获取itemID错误：", err);
                     reject(err);
                 },
                 ontimeout: function () {
-                    steamConnection = false;
+                    failedSteamConnection();
                     let err = { "status": 408, "statusText": "无法访问steam" };
+                    console.log("获取itemID超时：", err);
                     reject(err);
                 }
             });
@@ -409,15 +424,98 @@
                         reject(err);
                     },
                     ontimeout: function () {
-                        steamConnection = false;
+                        failedSteamConnection();
                         let err = { "status": 408, "statusText": "无法访问steam" };
+                        console.log("访问steamorder列表超时：", err);
                         reject(err);
                     }
                 });
             }).catch(function onRejected(err) {
-                console.log('获取itemID错误：', err);
                 reject(err);
             });
+        });
+    }
+
+    function getProtectionRules(currencyCode) {
+        switch (currencyCode) {
+            case 1:             // 美元
+            case 3:             // 欧元
+            case 23:            // 人民币
+                break;
+            case 5:             // 卢布
+                break;
+        }
+    }
+
+    function marketListLoadData(item, good, randomID, secendTry) {
+        let target = $(good).find("p>strong.f_Strong")[0];
+        let error = false;
+        let buff_item_id = item.id;                                 // buff商品ID
+        let buff_buy_num = item.buy_num;                            // buff求购数量
+        let buff_buy_max_price = item.buy_max_price;                // buff求购最高价
+        let buff_sell_num = item.quick_price;                       // buff出售数量
+        let buff_sell_min_price = item.sell_min_price;              // buff出售最低价
+        let steam_price_cny = item.goods_info.steam_price_cny;      // buff提供的steam国区售价
+        let steam_market_url = item.steam_market_url;               // steam市场链接
+        let buff_sell_reference_price = item.sell_reference_price;  // buff出售参考价(没卵用)
+        let steam_highest_buy_order = 0;                                // steam最高求购价
+        let steam_lowest_sell_order = 0;                                // steam最低出售价
+        $(good).attr("data-order-sort", Infinity);
+        getSteamOrderList(buff_item_id, steam_market_url, secendTry).then(function onFulfilled(json) {
+            steam_highest_buy_order = json.highest_buy_order / 100;
+            steam_lowest_sell_order = json.lowest_sell_order / 100;
+            let orderNumber = $(json.buy_order_summary)[0].innerText;
+            let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order);
+            $(good).attr("data-order-sort", steamOrderScale);
+            $(target).after($(steanOrderNumberTemp).text(orderNumber + "┊"));
+            paintingGradient(steamOrderScale, target, 4, steanOrderScaleTemp);
+        }).catch(function onRejected(err) {
+            switch (err.status) {
+                case 429:
+                    steamConnection = true;
+                    err.statusText = "请求次数过多";
+                    break;
+                case 500:
+                    if (!secendTry) {
+                        console.log("自动重试状态异常项目");
+                        error = true;
+                        return;
+                    }
+                    err.statusText = "内部服务器错误";
+                    break;
+                case 0:
+                    failedSteamConnection();
+                    err.statusText = "无法访问steam";
+                    break;
+            }
+            $(target).after($(steanOrderNumberErrorTemp).text(err.statusText));
+        }).finally(() => {
+            if (error) {
+                marketListLoadData(item, good, randomID, true);
+                return;
+            }
+            let lowest_sell_price = steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny;
+            let withoutFeePrice = getWithoutFeePrice(lowest_sell_price);
+            let scale = getScale(buff_sell_min_price, lowest_sell_price);
+            if (withoutFeePrice > 10000 || buff_sell_min_price > 10000) {  // 防止价格太长换行
+                withoutFeePrice = Math.round(withoutFeePrice);
+                scale = scale > 10 ? Math.round(scale) : Math.round(scale * 10) / 10;
+            }
+            if (withoutFeePrice == 0 || (displayCurrency.eCurrencyCode == 5 && withoutFeePrice >= 1000)) {
+                withoutFeePrice = "";
+            }
+            $(good).attr("data-buff-sort", scale);
+            if (scale === Infinity) {
+                scale = "∞";
+            }
+            $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
+            paintingGradient(scale, target, 3);
+            helper_config.sortAfterAllDone
+            if (needSort && (helper_config.sortAfterAllDone ? itemCount == itemNum - 1 : true)) {
+                let arr = needSort.split("_");
+                sortGoods("data-" + arr[0], arr[1] == "asc");
+            }
+            updateProgressBar(randomID);
         });
     }
 
@@ -437,7 +535,8 @@
         let buff_item_id = getUrlParam("goods_id");
         let items = data.items;
         let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny;
-        let steam_price_without_fee = 0;            // steam卖出实收         
+        let steam_price_without_fee = 0;            // steam卖出实收      
+        steamFailedTimes = items.length;
         let pm = new Promise(function (resolve, reject) {
             if (isFirstTime) {
                 getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
@@ -451,11 +550,11 @@
                             err.statusText = "请求次数过多";
                             break;
                         case 500:
-                            err.statusText = "请重试";
+                            err.statusText = "内部服务器错误，请稍后重试";
                             break;
-                        case 408:
                         case 0:
-                            steamConnection = false;
+                            failedSteamConnection();
+                        case 408:
                             err.statusText = "访问steam超时，请检查steam市场连接性";
                             break;
                     }
@@ -522,64 +621,8 @@
         $(".tab>li.on").append("<i id=helper-loading-" + randomID + " class=\"icon icon_uploading helper-loading\"></i>");
         $(".market-list .blank20").prepend('<div id=helper-progress-bar-' + randomID + ' class="helper-progress-bar"></div>');
         for (let i = 0; i < goods.length; i++) {
-            let target = $(goods[i]).find("p>strong.f_Strong")[0];
             $(goods[i]).attr("data-default-sort", i);
-            let buff_item_id = items[i].id;                                 // buff商品ID
-            let buff_buy_num = items[i].buy_num;                            // buff求购数量
-            let buff_buy_max_price = items[i].buy_max_price;                // buff求购最高价
-            let buff_sell_num = items[i].quick_price;                       // buff出售数量
-            let buff_sell_min_price = items[i].sell_min_price;              // buff出售最低价
-            let steam_price_cny = items[i].goods_info.steam_price_cny;      // buff提供的steam国区售价
-            let steam_market_url = items[i].steam_market_url;               // steam市场链接
-            let buff_sell_reference_price = items[i].sell_reference_price;  // buff出售参考价(没卵用)
-            let steam_highest_buy_order = 0;                                // steam最高求购价
-            let steam_lowest_sell_order = 0;                                // steam最低出售价
-            getSteamOrderList(buff_item_id, steam_market_url).then(function onFulfilled(json) {
-                steam_highest_buy_order = json.highest_buy_order / 100;
-                steam_lowest_sell_order = json.lowest_sell_order / 100;
-                let orderNumber = $(json.buy_order_summary)[0].innerText;
-                let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order);
-                $(goods[i]).attr("data-order-sort", steamOrderScale);
-                $(target).after($(steanOrderNumberTemp).text(orderNumber + "┊"));
-                paintingGradient(steamOrderScale, target, 4, steanOrderScaleTemp);
-            }).catch(function onRejected(err) {
-                switch (err.status) {
-                    case 429:
-                        steamConnection = true;
-                        err.statusText = "请求次数过多";
-                        break;
-                    case 500:
-                        err.statusText = "请重试";
-                        break;
-                    case 0:
-                        steamConnection = false;
-                        err.statusText = "无法访问steam";
-                        break;
-                }
-                $(target).after($(steanOrderNumberErrorTemp).text(err.statusText));
-            }).finally(() => {
-                let lowest_sell_price = steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny;
-                let withoutFeePrice = getWithoutFeePrice(lowest_sell_price);
-                let scale = getScale(buff_sell_min_price, lowest_sell_price);
-                if (withoutFeePrice > 10000 || buff_sell_min_price > 10000) {  // 防止价格太长换行
-                    withoutFeePrice = Math.round(withoutFeePrice);
-                    scale = scale > 10 ? Math.round(scale) : Math.round(scale * 10) / 10;
-                }
-                if (withoutFeePrice == 0 || (displayCurrency.eCurrencyCode == 5 && withoutFeePrice >= 100)) {
-                    withoutFeePrice = "";
-                }
-                if (scale === Infinity) {
-                    scale = "∞";
-                }
-                $(goods[i]).attr("data-buff-sort", scale);
-                $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
-                paintingGradient(scale, target, 3);
-                if (needSort && itemCount == itemNum - 1) {
-                    let arr = needSort.split("_");
-                    sortGoods("data-" + arr[0], arr[1] == "asc");
-                }
-                updateProgressBar(randomID);
-            });
+            marketListLoadData(items[i], goods[i], randomID);
         }
         $("#j_list_card").addClass("calculated");
     }
@@ -588,6 +631,7 @@
         GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
+                steamFailedTimes = 0;
                 // 批量购买（未完成）
                 // if ($("#helper-bulk-buy").length == 0) {
                 //     $("#batch-buy-btn").after($('<a href="javascript:" class="i_Btn i_Btn_mid" id="helper-bulk-buy">批量购买</a>'));
@@ -645,6 +689,7 @@
         });
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods") && result.data.items) {
+                steamFailedTimes = 0;
                 buff_csgo_list_scale_plugin_load(result.data.items);
             }
         });

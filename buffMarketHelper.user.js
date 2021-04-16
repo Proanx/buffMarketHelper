@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.12
-// @note            更新于2021年4月15日21:59:42
+// @version         2.1.13
+// @note            更新于2021年4月16日10:44:36
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -85,7 +85,7 @@
     }
 
     function syncCurrency() {
-        steamCurrency = g_rgCurrencyData[helper_config.steamCurrency.strCode];
+        steamCurrency = g_rgCurrencyData[helper_config.steamCurrency];
         $("#helper-setting-currencyDisplayMode").attr("value", helper_config.currencyDisplayMode);
         $("#helper-setting-currencyDisplayMode>h3").text($("#helper-setting-currencyDisplayMode li[value=" + helper_config.currencyDisplayMode + "]").addClass("on").text());
         $("#helper-setting-currency").attr("value", steamCurrency.strCode);
@@ -165,7 +165,7 @@
             sortAfterAllDone: true,
             marketColorLow: "#ff1e1e",
             marketColorHigh: "#5027ff",
-            steamCurrency: g_rgCurrencyData["CNY"],
+            steamCurrency: "CNY",
             currencyDisplayMode: "strCode"
         };
     }
@@ -642,6 +642,8 @@
 
     if (location.pathname === "/market/goods") {
         GM_addStyle(".icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #d4b527;font-size: 12px;margin-left: 6px;}");
+        // 设置初始化
+        init();
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (header.url.startsWith("/api/market/goods/sell_order") && result.data) {
                 steamFailedTimes = 0;

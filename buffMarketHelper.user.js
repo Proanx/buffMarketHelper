@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.1.13
-// @note            更新于2021年4月16日10:44:36
+// @version         2.2.0
+// @note            更新于2021年4月16日13:38:08
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ

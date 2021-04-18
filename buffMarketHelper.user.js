@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀？批量购买？找玄学？不如先整个小帮手帮你，问题反馈QQ群544144372
-// @version         2.2.4
-// @note            更新于2021年4月18日15:56:37
+// @version         2.3.0
+// @note            更新于2021年4月19日00:00:51
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -36,6 +36,7 @@
         minRange: 0.63,
         needSort: null,
         ajaxTimeOut: 5000,
+        pageSize: 20,
         overrideSortRule: false,
         sortAfterAllDone: true,
         marketColorLow: "#ff1e1e",
@@ -45,8 +46,8 @@
     };
     var steam_lowest_sell_order_detail = 0;     // 商品详情页专用-steam最低出售价
     var steam_highest_buy_order_detail = 0;     // 商品详情页专用-steam最高求购价
-    var helper_config = loadConfig();
-    var displayCurrency = getDisplayCurrency();
+    var helper_config;
+    var displayCurrency;
     var steamCurrency;
     var steamConnection = undefined;
     var steamFailedTimes = 0;
@@ -58,8 +59,12 @@
 
     // 设置界面
     GM_addStyle(".helper-setting input[type=number]{max-width:70px}input[type=\"number\"]{-moz-appearance:textfield}.helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:40px 54px;top:25%}.w-Checkbox.helper-setting-option>span:first-child{margin:0!important;font-size:14px}.helper-setting-steamConnection i.icon{margin-left:0!important}.helper-setting .list_tb span,.helper-setting .list_tb i.icon{margin-left:12px}.helper-setting .icon_status_progressing{animation:rotate-L 1.5s linear infinite;-webkit-animation:rotate-L 1.5s linear infinite}");
-    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序（比如当你按价格排序时）比例排序规则重置为默认，不再按比例排序（刷新页面后会恢复保存的规则）" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="启用时会等所有饰品比例都加载完成再进行排序，关闭时每加载完一个饰品就排序一次" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">steam参考货币 </td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Center"><i class="icon icon_qa j_tips_handler" style="margin-left: 0;" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误。默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr><tr><td class="t_Left c_Gray">请求超时时间 <i class="icon icon_qa j_tips_handler" data-title="关于超时时间：" data-content="默认值为5000（5秒）<br/>如果你可以访问steam市场但是却经常提示你连接steam超时时，你应该增大这个值。" data-direction="right"></i></td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-ajaxTimeout" data-option-target="ajaxTimeOut" class="i_Text helper-setting-option" min="1000" max="60000" step="100"></span><span class="c_DGray">ms</span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色（市场）</td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色<br/>渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值 </td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色<br/>比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">反馈QQ群：544144372</a><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span></td></tr></tbody></table></div></div>');
-    // 初始化货币,其他初始化在内部
+    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序（比如当你按价格排序时）比例排序规则重置为默认，不再按比例排序（刷新页面后会恢复保存的规则）" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序 <i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="启用时会等所有饰品比例都加载完成再进行排序，关闭时每加载完一个饰品就排序一次" data-direction="right"></i></td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">steam参考货币 </td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Center"><i class="icon icon_qa j_tips_handler" style="margin-left: 0;" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误。默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr><tr><td class="t_Left c_Gray">每页显示数量</td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-pageSize" data-option-target="pageSize" class="i_Text helper-setting-option" min="1" max="80" step="1"></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">请求超时时间 <i class="icon icon_qa j_tips_handler" data-title="关于超时时间：" data-content="默认值为5000（5秒）<br/>如果你可以访问steam市场但是却经常提示你连接steam超时时，你应该增大这个值。" data-direction="right"></i></td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-ajaxTimeout" data-option-target="ajaxTimeOut" class="i_Text helper-setting-option" min="1000" max="60000" step="100"></span><span class="c_DGray">ms</span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色（市场）</td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色<br/>渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值 </td><td class="t_Center" style="position: relative;"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色<br/>比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i></td><td class="t_Center"><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">反馈QQ群：544144372</a><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span></td></tr></tbody></table></div></div>');
+    helper_config = loadConfig();
+    displayCurrency = getDisplayCurrency();
+    // 添加翻页和设置按钮，初始化部分数据
+    initHelper();
+    // 初始化货币
     initCurrency();
 
     // 商品详情
@@ -358,6 +363,81 @@
         if (isEn) {
             $(".ctag.btn_3d").html($(".ctag.btn_3d").html().substr(0, 37));
         }
+
+        function getItemDetail(parent, secondTime) {
+            // 拿到每个饰品的图片对象
+            let skin = $(parent).find(".item-detail-img")[0];
+            // 获取饰品对应的信息并加载进data
+            let classid = $(skin).data("classid");
+            let instanceid = $(skin).data("instanceid");
+            let sell_order_id = $(skin).data("orderid");
+            let origin = $(skin).data("origin");
+            let assetid = $(skin).data("assetid");
+            let data = {
+                appid: 730,
+                game: "csgo",
+                classid: classid,
+                instanceid: instanceid,
+                sell_order_id: sell_order_id,
+                origin: origin,
+                assetid: assetid
+            };
+            // 发送异步请求获取饰品详情
+            $.ajax({
+                url: "/market/item_detail",
+                method: "get",
+                data: data,
+                success: function (data) {
+                    let result = $(data)[0];
+                    // 获取待添加种子的dom对象
+                    let origin_float = $(parent).find(".wear-value")[0];
+                    try {
+                        let seed = "<div class='wear-value'>图案模板(seed):&nbsp;<b style='color:crimson'>" + $(result).find(".skin-info>p:first").text().match(/\d{1,}/)[0] + "</b></div>";
+                        $(origin_float).before(seed);
+                    } catch (error) {
+                        if (secondTime) {
+                            console.log("Items do not exist, sec try");
+                            $(origin_float).before("<div class='wear-value'><b style='color:crimson'>获取失败，请稍后再试</b></div>");
+                            return;
+                        } else {
+                            console.log("Items do not exist, first try");
+                            setTimeout(getItemDetail(parent, true), 500);
+                        }
+                    }
+                    // 获取名称标签对象
+                    let name = $(result).find("p.name_tag")[0];
+                    if (name) {
+                        // 设定名称标签的样式
+                        $(name).css({
+                            "background": "transparent",
+                            "padding": "0"
+                        });
+                        // 获取待添加名称标签的对象并添加名称标签
+                        let targ_name = $(parent).find(".csgo_value")[0];
+                        $(targ_name).before(name);
+                    }
+                    // 截取皮肤磨损并加粗
+                    origin_float.innerHTML = "磨损: <b>" + origin_float.innerText.match(/0[.]\d*/)[0] + "</b>";
+                    // 获取排名对象
+                    let rank = $(result).find(".skin-info>.des")[0];
+                    if (rank) {
+                        // 位置在种子后面
+                        $(parent).find(".csgo_value>.wear-value:first").append("<span style='margin-left:10px'>磨损排名:&nbsp;<b class='float_rank'>" + rank.innerText.match(/\d{1,}/)[0] + "</b></span>");
+                        // 位置在磨损后面
+                        // $(origin_float).html(origin_float.innerHTML + "<i class='float_rank'>「#<b>" + rank.innerText.match(/\d{1,}/)[0] + "</b>」</i>");
+                    }
+                },
+                error: function (msg) {
+                    if (msg.status == 429) {
+                        msg.statusText = "请求太频繁";
+                    }
+                    console.log("error:", msg);
+                    let origin_float = $(parent).find(".wear-value")[0];
+                    $(origin_float).before("<div class='wear-value'><b style='color:crimson'>" + msg.statusText + "</b></div>");
+                }
+            });
+        }
+
     };
 
     if (location.pathname === "/market/goods") {
@@ -403,6 +483,7 @@
             }
             $(".buff-helper-sort").removeClass("on");
         });
+        syncSort();
         setTimeout(() => {
             // 修改buff排序时重置比例排序规则
             $("div[name='sort_by']").change(function () {
@@ -412,14 +493,15 @@
                 }
             });
         }, 500);
-        $(document).ajaxSend(function (event, status, header, result) {
+        $(document).ajaxSend(function (event, xhr, header, result) {
             if (header.url.startsWith("/api/market/goods")) {
+                header.url += "&page_size=" + helper_config.pageSize;
                 $(".helper-progress-bar").remove();
                 $(".helper-loading").remove();
                 steamFailedTimes = 0;
             }
         });
-        $(document).ajaxSuccess(function (event, status, header, result) {
+        $(document).ajaxSuccess(function (event, xhr, header, result) {
             if (header.url.startsWith("/api/market/goods") && result.data.items) {
                 buffHelperMarkerListScale(result.data.items);
             }
@@ -468,6 +550,8 @@
         GM_registerMenuCommand('打开设置面板', () => {
             openSettingPanel();
         });
+        // 初始化设置页面后填装面板
+        init();
     }
 
     function openSettingPanel() {
@@ -510,9 +594,7 @@
             for (let key in g_rgCurrencyData) {
                 $(".steam-currency-selector").append("<li value=" + g_rgCurrencyData[key].strCode + ">" + g_rgCurrencyData[key][helper_config.currencyDisplayMode] + "</li>");
             }
-            init();
-            // 添加翻页和设置按钮，初始化部分数据
-            initHelper();
+            syncCurrency();
         } else {
             for (let li of list) {
                 let jq = $(li);
@@ -532,6 +614,7 @@
         if (helper_config.needSort) {
             syncSort();
         }
+        $("#helper-setting-pageSize").val(helper_config.pageSize);
         $("#helper-setting-maxRange").val(helper_config.maxRange);
         $("#helper-setting-minRange").val(helper_config.minRange);
         $("#helper-setting-ajaxTimeout").val(helper_config.ajaxTimeOut);
@@ -835,80 +918,6 @@
             }).catch(function onRejected(err) {
                 reject(err);
             });
-        });
-    }
-
-    function getItemDetail(parent, secondTime) {
-        // 拿到每个饰品的图片对象
-        let skin = $(parent).find(".item-detail-img")[0];
-        // 获取饰品对应的信息并加载进data
-        let classid = $(skin).data("classid");
-        let instanceid = $(skin).data("instanceid");
-        let sell_order_id = $(skin).data("orderid");
-        let origin = $(skin).data("origin");
-        let assetid = $(skin).data("assetid");
-        let data = {
-            appid: 730,
-            game: "csgo",
-            classid: classid,
-            instanceid: instanceid,
-            sell_order_id: sell_order_id,
-            origin: origin,
-            assetid: assetid
-        };
-        // 发送异步请求获取饰品详情
-        $.ajax({
-            url: "/market/item_detail",
-            method: "get",
-            data: data,
-            success: function (data) {
-                let result = $(data)[0];
-                // 获取待添加种子的dom对象
-                let origin_float = $(parent).find(".wear-value")[0];
-                try {
-                    let seed = "<div class='wear-value'>图案模板(seed):&nbsp;<b style='color:crimson'>" + $(result).find(".skin-info>p:first").text().match(/\d{1,}/)[0] + "</b></div>";
-                    $(origin_float).before(seed);
-                } catch (error) {
-                    if (secondTime) {
-                        console.log("Items do not exist, sec try");
-                        $(origin_float).before("<div class='wear-value'><b style='color:crimson'>获取失败，请稍后再试</b></div>");
-                        return;
-                    } else {
-                        console.log("Items do not exist, first try");
-                        setTimeout(getItemDetail(parent, true), 500);
-                    }
-                }
-                // 获取名称标签对象
-                let name = $(result).find("p.name_tag")[0];
-                if (name) {
-                    // 设定名称标签的样式
-                    $(name).css({
-                        "background": "transparent",
-                        "padding": "0"
-                    });
-                    // 获取待添加名称标签的对象并添加名称标签
-                    let targ_name = $(parent).find(".csgo_value")[0];
-                    $(targ_name).before(name);
-                }
-                // 截取皮肤磨损并加粗
-                origin_float.innerHTML = "磨损: <b>" + origin_float.innerText.match(/0[.]\d*/)[0] + "</b>";
-                // 获取排名对象
-                let rank = $(result).find(".skin-info>.des")[0];
-                if (rank) {
-                    // 位置在种子后面
-                    $(parent).find(".csgo_value>.wear-value:first").append("<span style='margin-left:10px'>磨损排名:&nbsp;<b class='float_rank'>" + rank.innerText.match(/\d{1,}/)[0] + "</b></span>");
-                    // 位置在磨损后面
-                    // $(origin_float).html(origin_float.innerHTML + "<i class='float_rank'>「#<b>" + rank.innerText.match(/\d{1,}/)[0] + "</b>」</i>");
-                }
-            },
-            error: function (msg) {
-                if (msg.status == 429) {
-                    msg.statusText = "请求太频繁";
-                }
-                console.log("error:", msg);
-                let origin_float = $(parent).find(".wear-value")[0];
-                $(origin_float).before("<div class='wear-value'><b style='color:crimson'>" + msg.statusText + "</b></div>");
-            }
         });
     }
 

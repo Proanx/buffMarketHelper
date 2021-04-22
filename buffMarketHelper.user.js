@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.4
-// @note            更新于2021年4月22日15:09:04
+// @version         2.3.5
+// @note            更新于2021年4月22日16:01:20
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -140,7 +140,7 @@
                     return;
                 }
                 $(".helper-loading").remove();
-                $(".list_tb_csgo>tr>th:nth-child(5)").after('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
+                $(".detail-tab-cont th:last").before('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
                 steam_price_without_fee = getWithoutFeePrice(steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny);
                 for (let i = 0; i < items.length; i++) {
                     let buff_sell_price = items[i].price;

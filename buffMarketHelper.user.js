@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.8
-// @note            更新于2021年5月25日22:07:23
+// @version         2.3.9
+// @note            更新于2021年5月25日22:50:44
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -464,8 +464,6 @@
 
     };
 
-    if (!GM_getValue("\x68\x65\x6c\x70\x65\x72\x5f\x61\x6c\x65\x72\x74\x5f\x66\x69\x72\x73\x74")) { if (confirm("\u770b\u8d77\u6765\u4f60\u662f\u7b2c\u4e00\u6b21\u5b89\u88c5\u8fd9\u4e2a\u63d2\u4ef6\uff08\"\u7f51\u6613\x42\x55\x46\x46\u4ef7\u683c\u6bd4\u4f8b\x28\u627e\u6302\u5200\x29\u63d2\u4ef6\"\uff09\uff0c\u672c\u63d2\u4ef6\u5b8c\u5168\u514d\u8d39\uff0c\u8ba9\u4f60\u4ed8\u8d39\u8d2d\u4e70\u7684\u90fd\u662f\u9a97\u5b50\u3002\u8bf7\u719f\u77e5\u5e76\u70b9\u51fb\u786e\u8ba4")) { GM_setValue("\x68\x65\x6c\x70\x65\x72\x5f\x61\x6c\x65\x72\x74\x5f\x66\x69\x72\x73\x74", true) } else { return } }
-
     if (location.pathname === "/market/goods") {
         // 自带css
         GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
@@ -549,12 +547,27 @@
         }
         if ($("#buff_tool_nextpage").length != 0) { return; }
         if (!GM_getValue("helper_alert_first")) {
-            if (confirm("看起来你是第一次安装这个插件（\"网易BUFF价格比例(找挂刀)插件\"），本插件完全免费，让你付费购买的都是骗子。请熟知并点击确认")) {
-                GM_setValue("helper_alert_first", true);
-            } else {
-                return;
-            }
-        }    
+            $("body").append('<div id="j_w-Toast" class="w-Toast_warning" style="display: block; margin-left: -195px; margin-top: -35px;"><p><i class="icon icon_warning_mid"></i>你应该是第一次安装“网易BUFF价格比例(找挂刀)插件” 本插件完全免费，让你付费购买的都是骗子。请熟知。</p> <div> <a href="javascript:void(0)" class="agreementsBtn i_Btn i_Btn_mid i_Btn_D_red" style="margin-top: 15px;">我已知晓<span class="agreementsCountDown" style="margin-left:10px">5</span></a></div></div>');
+            let count = 5;
+            let countDown = setInterval(function () {
+                if (--count == 0) {
+                    clearInterval(countDown);
+                    $(".agreementsCountDown").remove();
+                } else {
+                    $(".agreementsCountDown").text(count);
+                }
+            }, 1000);
+            $(".agreementsBtn").click(function () {
+                if (!count) {
+                    GM_setValue("helper_alert_first", true);
+                    $("#j_w-Toast").hide("normal", () => {
+                        $("#j_w-Toast").remove();
+                    });
+                } else {
+                    alert("认真看一会，还有" + count + "秒就可以点了");
+                }
+            });
+        }
         // 设置按钮
         $(".floatbar>ul").prepend("<li><a id='buff_tool_setting'><i class='icon icon_menu_setting'></i><p>设置</p></a></li>");
         $("#buff_tool_setting").click(function () {

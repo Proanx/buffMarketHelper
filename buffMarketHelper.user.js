@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.9
-// @note            更新于2021年5月25日22:50:44
+// @version         2.3.10
+// @note            更新于2021年5月27日19:42:22
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -87,12 +87,18 @@
             let isFirstTime = $(".good_scale").length == 0;
             let steamLink = $(".steam-link").attr("href");
             let buff_item_id = getUrlParam("goods_id");
+            let app_id = data.goods_infos[buff_item_id].appid;
+            let hash_name = encodeURIComponent(data.goods_infos[buff_item_id].market_hash_name);
             let items = data.items;
             let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny;
             let steam_price_without_fee = 0;            // steam卖出实收   
             let error = false;
             let pm = new Promise(function (resolve, reject) {
                 if (isFirstTime) {
+                    getSteamSoldNumber(app_id, hash_name).then(function onFulfilled(json) {
+                        if (!json.volume) { json.volume = 0; }
+                        $(".detail-cont").append(`<div id="steam_sold">有 <span class="market_commodity_orders_header_promote">${json.volume}</span> 份在 24 小时内售出</div>`);
+                    }).catch(() => { });
                     getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
                         steam_highest_buy_order_detail = json.highest_buy_order / 100;
                         steam_lowest_sell_order_detail = json.lowest_sell_order / 100;
@@ -466,14 +472,20 @@
 
     if (location.pathname === "/market/goods") {
         // 自带css
-        GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_sold{margin-top:5px}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".steam-link{float:right;margin-top:3px}.detail-cont>.blank20{height:10px}");
         // 组件css
         GM_addStyle(".paymentIcon{padding:1px 13px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.list_tb_csgo>tr>th:first-child{width:10px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:-webkit-fill-available;max-height:max-content;}.csgo_sticker.has_wear{position:absolute;margin-left:230px;}.sticker_parent_div{margin:14px 0 0 360px !important}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
         GM_addStyle(".tooltip .tooltiptext{visibility:hidden;border: 1px solid #d0d0d0;width:128px;height:96px;background-color:#fbfbfbc7;position:absolute;z-index:60;bottom:100%;margin-left:-62px;border-radius:10px}.tooltip:hover .tooltiptext{visibility:visible}");
         // 求购列表css
-        GM_addStyle(".steam-link{float:right}.market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
+        GM_addStyle(".market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
+
         $(".detail-pic").css("background-repeat", "round").children().width(250);
-        $(".detail-cont>p").append($(".detail-summ>a").clone().addClass("steam-link"));
+        if ($("#j_game-switcher").data("current") == "dota2") {
+            $(".detail-cont>p").append($(".detail-summ>a").clone().addClass("steam-link"));
+        } else {
+            $(".detail-cont>div:first").append($(".detail-summ>a").clone().addClass("steam-link"));
+        }
         // 适配 ”饰品比例计算脚本“
         $(".detail-summ>a").hide();
         $(".detail-cont").css("margin-left", 0);
@@ -958,7 +970,7 @@
             }
             getItemId(buff_item_id, steamLink).then(function onFulfilled(steam_item_id) {
                 GM_xmlhttpRequest({
-                    url: window.location.protocol + "//steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=" + steamCurrency.eCurrencyCode + "&item_nameid=" + steam_item_id + "&two_factor=0",
+                    url: `https://steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=${steamCurrency.eCurrencyCode}&item_nameid=${steam_item_id}&two_factor=0`,
                     timeout: 20000,
                     method: "get",
                     onload: function (res) {
@@ -983,6 +995,43 @@
                 });
             }).catch(function onRejected(err) {
                 reject(err);
+            });
+        });
+    }
+
+    function getSteamSoldNumber(app_id, hash_name) {
+        return new Promise(function (resolve, reject) {
+            if (!steamConnection && steamConnection != undefined) {
+                let err = { "status": 408, "statusText": "无法访问steam" };
+                reject(err);
+                return;
+            }
+            GM_xmlhttpRequest({
+                url: `https://steamcommunity.com/market/priceoverview/?appid=${app_id}&currency=${steamCurrency.eCurrencyCode}&market_hash_name=${hash_name}`,
+                timeout: 20000,
+                method: "get",
+                onload: function (res) {
+                    if (res.status == 200) {
+                        steamConnection = true;
+                        let json = JSON.parse(res.responseText);
+                        if (json.success) {
+                            resolve(json);
+                        }
+                    } else {
+                        console.log("访问steam销售数量状态异常：", res);
+                        reject(res);
+                    }
+                },
+                onerror: function (err) {
+                    console.log("访问steam销售数量出错：", err);
+                    reject(err);
+                },
+                ontimeout: function () {
+                    failedSteamConnection();
+                    let err = { "status": 408, "statusText": "连接steam超时" };
+                    console.log("访问steam销售数量超时：", err);
+                    reject(err);
+                }
             });
         });
     }

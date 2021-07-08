@@ -3,8 +3,8 @@
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.11
-// @note            更新于2021年7月6日20:04:25
+// @version         2.3.12
+// @note            更新于2021年7月9日01:11:22
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -28,6 +28,11 @@
     // 防止重复安装冲突
     if ($(".logo").hasClass("buffHelperLoaded")) { return; }
     $(".logo").addClass("buffHelperLoaded");
+
+    // 全局（插件环境）异常捕获
+    window.onerror = function (e) {
+        console.log("出现了意料之外的错误" + "\n" + "行号：" + e.lineno + "  列号：" + e.colno + "  错误信息：" + e.message);
+    }
 
     const steamOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right steam_temp steam_order_scale\"></span>";
     const steamSoldNumberTemp = "<span class=\"f_12px c_Green f_Bold l_Right steam_temp steam_sold_number\"></span>";
@@ -63,28 +68,22 @@
     var needSort;
 
     // 为true时a标签会变成绿色提醒你
-    var isDemoVersion = 1;
+    var isDemoVersion = 0;
 
     // 设置界面
     GM_addStyle(".helper-setting input[type=number]{max-width:70px}input[type=\"number\"]{-moz-appearance:textfield}.helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:30px 40px 10px;top:25%}.w-Checkbox.helper-setting-option>span:first-child{margin:0!important;font-size:14px}.helper-setting-steamConnection i.icon{margin-left:0!important}.helper-setting .list_tb span,.helper-setting .list_tb i.icon{margin-left:12px}.helper-setting .icon_status_progressing{animation:rotate-L 1.5s linear infinite;-webkit-animation:rotate-L 1.5s linear infinite}.helper-setting>.list_tb tr:last-child>td{border-bottom:0}.helper-setting td.setting-title{height:0;border:0;padding:5px 0 0 0}");
+    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><span class="c_DGrey steamConnectionCountdown" style="display: none;"></span><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray">Steam参考货币</td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Center"><i class="icon icon_qa j_tips_handler helper-warning-currency" style="margin-left: 0;" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误。默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>市场页设定</b></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序（比如当你按价格排序时）比例排序规则重置为默认，不再按比例排序（刷新页面后会恢复保存的规则）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序</td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="启用时会等所有饰品比例都加载完成再进行排序，关闭时每加载完一个饰品就排序一次" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">每页显示数量</td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-pageSize" data-option-target="pageSize" class="i_Text helper-setting-option" min="1" max="80" step="1"></span><i class="icon icon_qa j_tips_handler helper-warning-pageNum" data-title="&lt;p class=&quot;c_Red&quot;&gt;可能加大封号风险&lt;/p&gt;" data-content="修改每页显示数量，由于buff反爬虫机制尚不明确，封号概率可能增加也可能减少，谨慎使用，默认值20，最大值80" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色</td><td class="t_Left" colspan="2" style="position: relative;"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色<br/>渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值</td><td class="t_Left" colspan="2" style="position: relative;"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色<br/>比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>详情页设定</b></td></tr><tr><td class="t_Left c_Gray">求购列表靠左显示</td><td class="t_Left" style="position: relative;"><span><div id="helper-setting-orderFloatLeft" class="w-Checkbox helper-setting-option" data-option-target="orderFloatLeft" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="决定求购列表是否显示在左侧（饰品图片之后）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">优化建议／BUG反馈 请加QQ群：544144372</a></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137-%E7%BD%91%E6%98%93buff%E4%BB%B7%E6%A0%BC%E6%AF%94%E4%BE%8B-%E6%89%BE%E6%8C%82%E5%88%80-%E6%8F%92%E4%BB%B6#additional-info">使用教程</a><span><a href="https://greasyfork.org/zh-CN/scripts/410137-%E7%BD%91%E6%98%93buff%E4%BB%B7%E6%A0%BC%E6%AF%94%E4%BE%8B-%E6%89%BE%E6%8C%82%E5%88%80-%E6%8F%92%E4%BB%B6#anchor">常见问题</a></span><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span></td></tr></tbody></table></div></div>');
     helper_config = loadConfig();
+    // 添加翻页和设置按钮，初始化部分数据
+    initHelper();
+    // 初始化货币
+    initCurrency();
 
-    // 通常会在底下的if之后执行
     $(function () {
-
-        window.onerror = function (e) {
-            console.log("出现了意料之外的错误" + "\n" + "行号：" + e.lineno + "  列号：" + e.colno + "  错误信息：" + e.message);
-        }
-
         if (isDemoVersion) {
             GM_addStyle("a{color:#00CC6A !important}");
         }
-        $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><span class="c_DGrey steamConnectionCountdown" style="display: none;"></span><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray">steam参考货币</td><td class="t_Left"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span></td><td class="t_Center"><i class="icon icon_qa j_tips_handler" style="margin-left: 0;" data-title="&lt;p class=&quot;c_Red&quot;&gt;没有特殊需求就不要改&lt;/p&gt;" data-content="选择获取steam数据时使用什么货币，buff价格依旧是人民币，乱改会导致比例错误。默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyDisplayMode" class="w-Select helper-setting-option" data-option-target="currencyDisplayMode" style="width: 80px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 80px;"><li value="strCode">缩写</li><li value="strSymbol">符号</li></ul></div></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>市场页设定</b></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序（比如当你按价格排序时）比例排序规则重置为默认，不再按比例排序（刷新页面后会恢复保存的规则）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序</td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="启用时会等所有饰品比例都加载完成再进行排序，关闭时每加载完一个饰品就排序一次" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="width: 130px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">每页显示数量</td><td class="t_Left" style="position: relative;"><span><input type="number" id="helper-setting-pageSize" data-option-target="pageSize" class="i_Text helper-setting-option" min="1" max="80" step="1"></span><i class="icon icon_qa j_tips_handler" data-title="&lt;p class=&quot;c_Red&quot;&gt;可能加大封号风险&lt;/p&gt;" data-content="修改每页显示数量，由于buff反爬虫机制尚不明确，封号概率可能增加也可能减少，谨慎使用，默认值20，最大值80" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色</td><td class="t_Left" colspan="2" style="position: relative;"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色<br/>渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值</td><td class="t_Left" colspan="2" style="position: relative;"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色<br/>比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>详情页设定</b></td></tr><tr><td class="t_Left c_Gray">求购列表靠左显示</td><td class="t_Left" style="position: relative;"><span><div id="helper-setting-orderFloatLeft" class="w-Checkbox helper-setting-option" data-option-target="orderFloatLeft" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="决定求购列表是否显示在左侧（饰品图片之后）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137-%E7%BD%91%E6%98%93buff%E4%BB%B7%E6%A0%BC%E6%AF%94%E4%BE%8B-%E6%89%BE%E6%8C%82%E5%88%80-%E6%8F%92%E4%BB%B6">本插件完全免费，让你付费购买的都是骗子</a></td></tr><tr><td class="t_Center" colspan="3"><a href="https://jq.qq.com/?_wv=1027&k=U8mqorxQ">反馈QQ群：544144372</a><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span></td></tr></tbody></table></div></div>');
         displayCurrency = getDisplayCurrency();
-        // 添加翻页和设置按钮，初始化部分数据
-        initHelper();
-        // 初始化货币
-        initCurrency();
     })
 
     if (location.pathname === "/market/goods") {
@@ -641,6 +640,38 @@
         GM_registerMenuCommand('打开设置面板', () => {
             openSettingPanel();
         });
+
+        // 求求你们别随便改货币了，说明也不看的
+        if (!GM_getValue("helper-trainingWheels-currency")) {
+            $("#helper-setting-currency").parent().before('<span class="trainingWheels-currency" style="width: 128px;cursor:help;height: 34px;z-index: 51;opacity:0;background-color:#f00;position: absolute;"></span>');
+            $(".trainingWheels-currency").click(function () {
+                $(".helper-warning-currency").mouseenter();
+                let cover = this;
+                $(cover).unbind("click");
+                $(cover).css({ "cursor": "not-allowed", "opacity": "0.5" });
+                let count = 0;
+                let interval = setInterval(() => {
+                    $(cover).css("opacity", (50 - count) / 100);
+                    if (count++ == 50) {
+                        cover.remove();
+                        clearInterval(interval);
+                    }
+                }, 100);
+                GM_setValue("helper-trainingWheels-currency", true);
+            });
+        }
+
+        // if (!GM_getValue("helper-trainingWheels-pageNum")) {
+        //     $("#helper-setting-pageSize").parent().before('<span class="trainingWheels-pageNum" style="width: 56px;height: 38px;z-index: 51;position: absolute;cursor: not-allowed;"></span>');
+        //     $(".trainingWheels-pageNum").click(function () {
+        //         GM_setValue("helper-trainingWheels-currency", true);
+        //         $(".helper-warning-pageNum").mouseenter();
+        //         setTimeout(() => {
+        //             $(".trainingWheels-pageNum").remove();
+        //         }, 3000);
+        //     });
+        // }
+
         // 初始化设置页面后填装面板
         init();
     }
@@ -662,6 +693,9 @@
     }
 
     function resetConfig() {
+
+        GM_setValue("helper-trainingWheels-currency", null);
+
         GM_setValue("helper_config", null);
         helper_config = clone(defaultConfig);
         initCurrency();
@@ -695,6 +729,7 @@
 
     function init() {
         $(".helper-setting>.list_tb .on").removeClass("on");
+
         if (helper_config.overrideSortRule) {
             $("#helper-setting-stickerSort").attr("value", helper_config.overrideSortRule).children(":first").addClass("on");
         }
@@ -725,6 +760,7 @@
         try {
             syncCurrency();
         } catch (error) {
+            // 因为旧版本和新版本数据不同，一个是json一个是字符，只能这么适配
             if (helper_config.steamCurrency.constructor === Object) {
                 helper_config.steamCurrency = helper_config.steamCurrency.strCode;
                 GM_setValue("helper_config", helper_config);

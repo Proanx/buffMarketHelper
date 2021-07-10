@@ -3,8 +3,8 @@
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.15
-// @note            更新于2021年7月9日14:19:01
+// @version         2.3.16
+// @note            更新于2021年2021年7月10日14:42:19
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -747,9 +747,7 @@
                 "float": "right"
             });
         }
-        if (helper_config.needSort) {
-            syncSort();
-        }
+        syncSort();
         $("#helper-setting-pageSize").val(helper_config.pageSize);
         $("#helper-setting-maxRange").val(helper_config.maxRange);
         $("#helper-setting-minRange").val(helper_config.minRange);

@@ -40,7 +40,8 @@
 
 ---  
 ### 如果上面的教程没有解决你的问题，你可以开反馈贴或者加QQ群:`544144372`[点击加群](https://jq.qq.com/?_wv=1027&amp;k=U8mqorxQ)，进群问上面有的问题一律不回  
-# 本插件完全免费  
 ### 插件代码托管在gitee上，如果你也是开发者可以直接发pr，欢迎其他开发者一起优化插件[gitee](https://gitee.com/pronax/buffMarketHelper)
 ### 如果你喜欢这个插件或者喜欢我本人  ，可以扫这里打赏↓  
-<img src="https://gitee.com/pronax/drawing-bed/raw/master/donate.png"  height="300" width="300">
+<img src="https://gitee.com/pronax/drawing-bed/raw/master/donate.png"  height="300" width="300">  
+
+# 本插件完全免费

@@ -3,8 +3,8 @@
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @description     找挂刀，看比例，挑玄学
-// @version         2.3.19
-// @note            更新于2021年7月13日00:11:34
+// @version         2.3.20
+// @note            更新于2021年7月14日17:35:08
 // @author          Pronax
 // @copyright       2021, Pronax
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
@@ -675,7 +675,8 @@
     }
 
     function getDisplayCurrency() {
-        let currencyList = { "¥-¥": "CNY", "$-$": "USD", "€-€": "EUR", "₽-₽": "RUB" };
+        // 美元符号是特殊字符。。。记得转义
+        let currencyList = { "¥-¥": "CNY", "\\$-\\$": "USD", "€-€": "EUR", "₽-₽": "RUB" };
         let text = $(".w-Counter-input").text();
         for (let key in currencyList) {
             if (text.search(key) == 1) {

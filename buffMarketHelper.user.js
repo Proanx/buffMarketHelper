@@ -2,16 +2,16 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.1
-// @note            更新于2021年7月16日17:43:10
+// @version         2.4.2
+// @note            更新于2021年7月26日22:09:42
 // @supportURL      https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @contributionURL https://afdian.net/@pronax
 // @license         AGPL-3.0
 // @copyright       2021, Pronax
-// @match           https://buff.163.com/market/goods*
-// @match           https://buff.163.com/market/?game=*
+// @match           https://buff.163.com/goods/*
+// @match           https://buff.163.com/market/*
 // @run-at          document-body
 // @require         https://cdn.jsdelivr.net/npm/notice.js@0.4.0/dist/notice.js
 // @grant           GM_info
@@ -98,12 +98,12 @@
         displayCurrency = getDisplayCurrency();
     })
 
-    if (location.pathname === "/market/goods") {
+    if (location.pathname.startsWith("/goods/")) {
         // 自带css
         GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_sold{margin-top:5px}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
         GM_addStyle(".steam-link{float:right;margin-top:3px}.detail-cont>.blank20{height:10px}");
         // 组件css
-        GM_addStyle(".paymentIcon{padding:1px 13px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.icon_payment_alipay{background-position:-417px -331px}.icon_payment_others{background-position:-510px 0}.list_tb_csgo>tr>th:first-child{width:10px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:-webkit-fill-available;max-height:max-content;}.csgo_sticker.has_wear{position:absolute;margin-left:230px;}.sticker_parent_div{margin:14px 0 0 360px !important}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
+        GM_addStyle(".paymentIcon{padding:1px 14px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.icon_payment_alipay{background-position:-534px -20px}.icon_payment_others{background-position:-510px 0}.list_tb_csgo>tr>th:first-child{width:10px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:-webkit-fill-available;max-height:max-content;}.csgo_sticker.has_wear{position:absolute;margin-left:230px;}.sticker_parent_div{margin:14px 0 0 360px !important}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
         GM_addStyle(".tooltip .tooltiptext{visibility:hidden;border: 1px solid #d0d0d0;width:128px;height:96px;background-color:#fbfbfbc7;position:absolute;z-index:60;bottom:100%;margin-left:-62px;border-radius:10px}.tooltip:hover .tooltiptext{visibility:visible}");
         // 求购列表css
         GM_addStyle(".market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
@@ -125,7 +125,7 @@
                 buffHelperGoodsDetailScale(result.data);
             }
         });
-    } else if (location.pathname === "/market/") {
+    } else if (location.pathname.startsWith("/market/")) {
         $(document).ajaxSend(function (event, xhr, header, result) {
             if (/^\/api\/market\/goods/.exec(header.url)) {
                 header.url += "&page_size=" + helper_config.pageSize;
@@ -195,7 +195,7 @@
             let isLogined = $("#navbar-cash-amount").length == 1;
             let isFirstTime = $(".good_scale").length == 0;
             let steamLink = $(".steam-link").attr("href");
-            let buff_item_id = getUrlParam("goods_id");
+            let buff_item_id = getGoodsId();
             let app_id = data.goods_infos[buff_item_id].appid;
             let hash_name = encodeURIComponent(data.goods_infos[buff_item_id].market_hash_name);
             let items = data.items;
@@ -448,7 +448,7 @@
             }
         }
         // 检测是否支持这个类型/游戏的饰品
-        let goods_id = getUrlParam("goods_id");
+        let goods_id = getGoodsId();
         if (data.goods_infos[goods_id].appid != 730 || data.total_count == 0 || enhancement_support_list.indexOf(data.goods_infos[goods_id].tags.category_group.internal_name) < 0) { return; }
         // 英文页面标志
         let isEn = $("#j_lang-switcher").data("current") === "en";
@@ -1014,15 +1014,9 @@
         return max >= min ? f * (max - min) + min : (1 - f) * (min - max) + max;
     }
 
-    function getUrlParam(name, url) {
-        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-        let result;
-        if (url) {
-            result = url.substr(34).match(reg);  //匹配目标参数
-        } else {
-            result = window.location.search.substr(1).match(reg);  //匹配目标参数
-        }
-        if (result != null) return unescape(result[2]); return null; //返回参数值
+    function getGoodsId() {
+        let result = window.location.pathname.match(/\d*$/)[0];  //匹配目标参数
+        if (result) return unescape(result); return null; //返回参数值
     }
 
     function exchangeRateToCNY(origin) {

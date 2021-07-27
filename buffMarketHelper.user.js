@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.3
-// @note            更新于2021年7月27日21:50:57
+// @version         2.4.4
+// @note            更新于2021年7月28日00:27:31
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -633,7 +633,7 @@
             let val = target.getAttribute("value") ? target.getAttribute("value") : target.value;
             helper_config[optionTarget] = val;
             GM_setValue("helper_config", helper_config);
-            if (optionTarget == "steamCurrency") {
+            if (optionTarget == "steamCurrency" && val != "CNY") {
                 updateRate();
             }
             init();

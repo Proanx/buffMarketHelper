@@ -10,35 +10,38 @@
 [**Bitaminkim**][bitaminkimGitee] | `提供关于steam地区与货币转换的实现`  
 
 ---
-## 插件可以干这些事 <a name="intro"></a>  
-#### 在市场列表页： （[图1](#photo1)）  
-- 显示饰品的挂刀比例、挂刀后的实际可得、steam求购人数、求购的挂刀比例  
-- 依据饰品的比例/挂刀比例进行从高到低/从低到高排序  
+## 本插件有以下功能 <a name="intro"></a>  
+
+## 在市场列表页： （[**完整图示1**][photo1]）  
+- 显示饰品的挂刀比例①、挂刀后的实际可得②、steam求购人数③、求购的挂刀比例  
 - 根据颜色区分比例高低，且颜色可以自定义  
-- 右侧悬浮栏添加巨大下一页按钮，不用拉到底部就可翻页  
+  ![1-1图示][iconograph1-1]
+- 依据饰品的比例/挂刀比例进行从高到低/从低到高排序  
+  ![1-2图示][iconograph1-2]
+- 右侧悬浮栏添加巨大下一页按钮，不用拉到底部就可翻页    
+- 右侧悬浮栏添加设置按钮，可以自定义一些属性  
+  ![1-3图示][iconograph1-3]
 - **调整每页显示数量（风险功能，建议修改前查看说明）**  
 
-#### 在饰品详情页： （[图2](#photo2)）  
-- 显示饰品的挂刀比例、steam求购人数、求购的挂刀比例  
-- steam过去24小时的销量显示  
-- steam求购列表的简单表格，防止丢求购时采坑
-- 右侧悬浮栏添加巨大下一页按钮，不用拉到底部就可翻页  
-- 每个饰品的预览按钮变大，点击图片即可查看检视图
-- 增大饰品的贴纸信息，鼠标放上可以查看大图
-- 倒转贴纸显示，与检视时相同（需在设置面板内开启）
-- 将饰品的图案模板(seed)、改名、磨损排名(如果有的话)直接显示出来
-- 修改支付方式图标与位置，更直观的展示支持的支付方式
+## 在饰品详情页： （[**完整图示2**][photo2]）  
+- 显示饰品的挂刀比例①、挂刀后的实际可得②、求购人数③、价格④、比例⑤等  
+- steam过去24小时的销量显示⑥  
+  ![2-1图示][iconograph2-1]
+- steam求购列表的简单表格，防止丢求购时采坑  
+  ![2-2图示][iconograph2-2]
+- 每个饰品的预览区域变大，点击图片即可查看检视图  
+  ![2-3图示][iconograph2-3]
+- 增大饰品的贴纸信息，鼠标放上可以查看大图  
+  ![2-4图示][iconograph2-4]
+- 倒转贴纸显示，与枪上顺序相同（需在设置面板内开启）
+- 将饰品的图案模板(seed)、改名、磨损排名(如果有的话)直接显示出来  
+  ![2-5图示][iconograph2-5]
+- 修改支付方式图标与位置，更直观的展示支持的支付方式  
+  ![2-6图示][iconograph2-6]
 
-#### 我还有个设置面板 （[图3](#photo3)） 
+## 我还有个设置面板 （[**完整图示3**][photo3]） 
 - 用来调整参考货币
 - 其他功能的相关设定
-
-### 图1 ↓ <a name="photo1"></a>  
-![介绍图1][photo1]
-### 图2 ↓ <a name="photo2"></a>  
-![介绍图2][photo2] 
-### 图3 ↓ 你可以在设置窗口自定义一些参数 <a name="photo3"></a>  
-![介绍图3][photo3]
 
 ---
 <a name="support"></a>
@@ -89,3 +92,14 @@
 [photo1]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D1.png
 [photo2]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D2.png
 [photo3]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D3.png
+[iconograph1-1]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-1.png
+[iconograph1-2]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-2.png
+[iconograph1-3]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-3.png
+[iconograph2-1]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-1.png
+[iconograph2-2]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-2.png
+[iconograph2-3]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-3.gif
+[iconograph2-4]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-4.gif
+[iconograph2-5]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-5.png
+[iconograph2-6]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-6.png
+
+

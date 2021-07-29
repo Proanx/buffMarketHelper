@@ -8,7 +8,6 @@
 **@lyl001** | `提供信息实现每页数量选择功能`  
 [**Gear Browser**][gearApp] | `提供关于正则修改建议`  
 [**Bitaminkim**][bitaminkimGitee] | `提供关于steam地区与货币转换的实现`  
-
 ---
 ## 本插件有以下功能 <a name="intro"></a>  
 
@@ -41,7 +40,7 @@
 
 ### 我还有个设置面板 （[**完整图示3**][photo3]） 
 - **用来调整参考货币**
-- **其他功能的相关设定**
+- **其他功能的相关设定**  
 
 ---
 ## **故障自查，请找到对应的问题后按顺序排查** <a name="support"></a>  
@@ -72,25 +71,29 @@
 8. **我设置不会用**
    1. 鼠标放到旁边的问号看说明
 
-### 上面没有列出或没有解决的问题可以开反馈贴或者加QQ群解决
+### 还有问题可以开[反馈贴][postFeedback]、加[QQ群][qqGroup2]或者发邮件[funkyturkey@yeah.net][emailMe]反馈
 > #### 1群：[~~`544144372`~~][qqGroup1] **已满**  
 > #### 2群：[`794103947`][qqGroup2]  
+**需要私人订制插件、付费版/高级版的朋友可以直接省去加群的步骤**
 
-### QQ群没有如：私人订制插件、付费版/高级版这样的服务，需要这些的朋友可以直接省去加群的步骤
 ---
-
 ### 普通用户有改进建议可以进上面的QQ群私信给管理，对于开发者们，插件代码托管在[gitee][giteePage]上，可以直接发pr。
 ### 不管你是普通人还是开发者，只要建议被采纳都会加进顶部的感谢名单！  ヽ(￣ω￣(￣ω￣〃)ゝ) 快来一起开发插件吧
 
 ### 如果你喜欢这个插件或者喜欢我本人，可以扫这里打赏↓  
 <img src="https://gitee.com/pronax/drawing-bed/raw/master/donate.png"  height="300" width="300">  
 
+<!-- Contributors -->
 [bitaminkimGitee]:https://gitee.com/Bitaminkim
 [gearApp]:https://gear4.app/
+<!-- Link -->
+[postFeedback]:https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion
+[emailMe]:mailto:funkyturkey@yeah.net?subject=%E8%BF%99%E9%87%8C%E6%9C%89%E4%B8%80%E4%B8%AAbug%E5%8F%8D%E9%A6%88/%E4%BF%AE%E6%94%B9%E5%BB%BA%E8%AE%AE
 [commits]:https://gitee.com/pronax/buffMarketHelper/commits/master
 [giteePage]:https://gitee.com/pronax/buffMarketHelper
 [qqGroup1]:https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 [qqGroup2]:https://jq.qq.com/?_wv=1027&k=98pr2kNH
+<!-- Image -->
 [photo1]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D1.png
 [photo2]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D2.png
 [photo3]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D3.png

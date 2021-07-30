@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.8
-// @note            更新于2021年7月30日11:43:51
+// @version         2.4.9
+// @note            更新于2021年7月30日15:12:26
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -11,15 +11,15 @@
 // @license         AGPL-3.0
 // @copyright       2021, Pronax
 // @match           https://buff.163.com/goods/*
-// @match           https://buff.163.com/market/*
+// @include         /https:\/\/buff\.163\.com\/market\/(csgo|dota2|rust|h1z1|tf2|pubg|pubg_recycle)/
 // @run-at          document-body
-// @require         https://cdn.jsdelivr.net/npm/notice.js@0.4.0/dist/notice.js
 // @grant           GM_info
 // @grant           GM_addStyle
 // @grant           GM_setValue
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
 // @grant           GM_registerMenuCommand
+// @require         https://greasyfork.org/scripts/430098-alihesari-s-notice-js-0-4-0/code/alihesari's%20noticejs%20040.js?version=955717
 // @connect         steamcommunity.com
 // @connect         esapi.isthereanydeal.com
 // ==/UserScript==
@@ -34,19 +34,32 @@
 
     // 全局（插件环境）异常捕获
     window.onerror = function (e) {
-        // let scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/\?name=(.*)\.user\.js/)[1]));
-        // if (scriptName == "网易BUFF价格比例(找挂刀)插件") {
-        //     // 引入的notice.js在两个提示框同时消失的时候会报错，这个if用于过滤掉这部分
-        //     if (e.lineno == 189 && e.colno == 45) { return; }
-        //     let lineno = e.lineno - 535;   // 常量不一定准确
-        //     let colno = e.colno;
-        //     let errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
-        //     let errorMsg = e.error.message;
-        //     let msgHtml = `恭喜！你可能发现了一个bug<hr/>行号：${lineno}<br/>列号：${colno}<br/>错误类型：${errorType}<br/>错误信息：${errorMsg}<hr/>点击下面的链接可以直接进行反馈<br/><a class="noticejs-link" href='mailto:funkyturkey@yeah.net?subject=Error Report ${lineno}:${colno} ${errorMsg}&body=${e.message}'>邮件反馈</a><a class="noticejs-link" href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a class="noticejs-link" href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
-        //     showMessage("出现了意料之外的错误", msgHtml, "error", 300);
-        // } else {
-        //     console.log(`插件名称：${scriptName}\n行号：${e.lineno}\n列号：${e.colno}\n错误信息：${e.message}`);
-        // }
+        if (!e.error) { return; }
+        let scriptName = undefined;
+        let errorType = undefined;
+        let renderingEngine = e.error.stack.match(/([^\s(@]*)-extension/)[1];
+        switch (renderingEngine) {
+            case "chrome":
+                // chrome+TamperMonkey在这个脚本内报错的情况下会需要两次decode
+                scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/([^\/=]*)\.user\.js/)[1]));
+                errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
+                break;
+            case "moz":
+                scriptName = decodeURIComponent(e.error.stack.match(/\/([^\/]*)\.user\.js/)[1]).trim();
+                errorType = e.message.match(/^([a-zA-Z]*): /)[1];
+                break;
+            default:
+                return;
+        }
+        if (scriptName == "网易BUFF价格比例(找挂刀)插件") {
+            let lineno = e.lineno - 535;   // 常量不一定准确
+            let colno = e.colno;
+            let errorMsg = e.error.message;
+            let msgHtml = `恭喜！你可能发现了一个bug<hr/>浏览器内核：${renderingEngine}<br/>行号：${lineno}<br/>列号：${colno}<br/>错误类型：${errorType}<br/>错误信息：${errorMsg}<hr/>点击下面的链接可以直接进行反馈<br/><a class="noticejs-link" href='mailto:funkyturkey@yeah.net?subject=Error Report ${renderingEngine} ${lineno}:${colno} ${errorMsg}'>邮件反馈</a><a class="noticejs-link" href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a class="noticejs-link" href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
+            showMessage("出现了意料之外的错误", msgHtml, "error", 300);
+        } else {
+            console.log(`插件名称：${scriptName}\n浏览器内核：${renderingEngine}\n行号：${e.lineno}\n列号：${e.colno}\n错误信息：${e.message}`);
+        }
     }
 
     const steamOrderScaleTemp = "<span class=\"f_12px f_Bold l_Right steam_temp steam_order_scale\"></span>";

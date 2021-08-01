@@ -6,8 +6,8 @@
 | | |
 --|--
 **@lyl001** | `提供信息实现每页数量选择功能`  
-[**Gear Browser**][gearApp] | `提供关于正则修改建议`  
-[**Bitaminkim**][bitaminkimGitee] | `提供关于steam地区与货币转换的实现`  
+[**Gear Browser**][contributors-gearApp] | `提供关于正则修改建议`  
+[**Bitaminkim**][contributors-bitaminkim] | `提供关于steam地区与货币转换的实现`  
 ---
 ## 本插件有以下功能 <a name="intro"></a>  
 
@@ -84,8 +84,8 @@
 <img src="https://gitee.com/pronax/drawing-bed/raw/master/donate.png"  height="300" width="300">  
 
 <!-- Contributors -->
-[bitaminkimGitee]:https://gitee.com/Bitaminkim
-[gearApp]:https://gear4.app/
+[contributors-bitaminkim]:https://keylol.com/forum.php?mod=viewthread&tid=731319
+[contributors-gearApp]:https://gear4.app/
 <!-- Link -->
 [postFeedback]:https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion
 [emailMe]:mailto:funkyturkey@yeah.net?subject=%E8%BF%99%E9%87%8C%E6%9C%89%E4%B8%80%E4%B8%AAbug%E5%8F%8D%E9%A6%88/%E4%BF%AE%E6%94%B9%E5%BB%BA%E8%AE%AE

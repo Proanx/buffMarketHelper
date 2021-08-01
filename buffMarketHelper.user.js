@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.12
-// @note            2021年8月1日13:21:46
+// @version         2.4.13
+// @note            更新于2021年8月1日18:49:30
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -188,7 +188,7 @@
             });
         }, 500);
         $(document).ajaxSuccess(function (event, xhr, header, result) {
-            if (/^\/api\/market\/goods/.exec(header.url) && result.data && result.data.items) {
+            if (/^\/api\/market\/goods/.exec(header.url) && result.data && result.data.total_count) {
                 buffHelperMarkerListScale(result.data.items);
             }
         });

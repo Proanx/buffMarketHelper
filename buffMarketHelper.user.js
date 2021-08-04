@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.13
-// @note            更新于2021年8月1日18:49:30
+// @version         2.4.14
+// @note            更新于2021年8月4日22:51:16
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -128,7 +128,9 @@
         } else {
             $(".detail-cont>div:first").append($(".detail-summ>a").clone().addClass("steam-link"));
         }
-        // 适配 ”饰品比例计算脚本“
+
+        // 适配 ”饰品比例计算脚本“ greasyfork.org/scripts/35597
+        // 防止排版冲突混乱
         $(".detail-summ>a").hide();
         $(".detail-cont").css("margin-left", 0);
 
@@ -312,7 +314,7 @@
                             }
                         }
                     }
-                    $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after('<td class="t_Left"><div style="display: table-cell;"><b class="seller_scale">' + scale + '</b></div></td>');
+                    $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after(`<td class="t_Left"><div style="display: table-cell;text-align: center;"><b class="seller_scale">${scale}</b><p class="c_Gray f_12px">${steam_highest_buy_order_detail?getScale(buff_sell_price, steam_highest_buy_order_detail):''}</p></div></td>`);
                 }
                 daemonThread();
             });

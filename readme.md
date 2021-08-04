@@ -5,9 +5,10 @@
 ## 感谢这些人的帮助与贡献
 | | |
 --|--
-**@lyl001** | `提供信息实现每页数量选择功能`  
-[**Gear Browser**][contributors-gearApp] | `提供关于正则修改建议`  
-[**Bitaminkim**][contributors-bitaminkim] | `提供关于steam地区与货币转换的实现`  
+**@lyl001** | `提供信息帮助实现每页数量选择功能`  
+[**Gear Browser**][contributors-gearApp] | `提供正则修改建议`  
+[**Bitaminkim**][contributors-bitaminkim] | `提供steam地区与货币转换的实现`  
+**Kylin** | `建议比例列加入求购比例`  
 ---
 ## 本插件有以下功能 <a name="intro"></a>  
 

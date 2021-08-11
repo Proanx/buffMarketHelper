@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.15
-// @note            更新于2021年8月5日11:41:16
+// @version         2.4.16
+// @note            更新于2021年8月11日22:16:45
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -117,7 +117,7 @@
         GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_sold{margin-top:5px}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
         GM_addStyle(".steam-link{float:right;margin-top:3px}.detail-cont>.blank20{height:10px}");
         // 组件css
-        GM_addStyle(".paymentIcon{padding:1px 14px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.icon_payment_alipay{background-position:-534px -20px}.icon_payment_others{background-position:-510px 0}.list_tb_csgo>tr>th:first-child{width:5px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo>tr>th:nth-child(4){min-width:185px !important}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:-webkit-fill-available;max-height:max-content;}.csgo_sticker.has_wear{position:absolute;margin-left:230px;}.sticker_parent_div{margin:14px 0 0 360px !important}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
+        GM_addStyle(".paymentIcon{padding:1px 17px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.list_tb_csgo>tr>th:first-child{width:5px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo>tr>th:nth-child(4){min-width:185px !important}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:-webkit-fill-available;max-height:max-content;}.csgo_sticker.has_wear{position:absolute;margin-left:230px;}.sticker_parent_div{margin:14px 0 0 360px !important}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
         GM_addStyle(".tooltip .tooltiptext{visibility:hidden;border: 1px solid #d0d0d0;width:128px;height:96px;background-color:#fbfbfbc7;position:absolute;z-index:60;bottom:100%;margin-left:-62px;border-radius:10px}.tooltip:hover .tooltiptext{visibility:visible}");
         // 求购列表css
         GM_addStyle(".market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
@@ -447,20 +447,22 @@
         }
         if ($("#market-selling-list").hasClass("buffed")) { return; }
         $("#market-selling-list").addClass("buffed");
+        // 不支持微信时给个占位图标
+        let alipayIcon = $(".icon_payment_alipay");
+        for (let i = 0; i < alipayIcon.length; i++) {
+            let element = alipayIcon[i];
+            if (!element.nextElementSibling) {
+                $(element).after('<i class="icon icon_select_wx_small" style="opacity:0;" title="Support BUFF Balances-bank card"></i>');
+            }
+        }
         // 支付图标移动到购买按钮下
         let paymentIcon = $(".icon_payment_alipay,.icon_payment_others").parent();
-        paymentIcon.addClass("paymentIcon");
+        paymentIcon.addClass("paymentIcon on");
+        $(".paymentIcon .icon_payment_alipay").addClass("icon_select_alipay_small").removeClass("icon_payment_alipay");
+        $(".paymentIcon .icon_payment_others").addClass("icon_select_wx_small").removeClass("icon_payment_others");
         for (let i = 0; i < paymentIcon.length; i++) {
             const element = paymentIcon[i];
             $(element).parent().next().append(element);
-        }
-        // 不支持支付宝时给个占位图标
-        let wechatIcon = $(".icon_payment_others");
-        for (let i = 0; i < wechatIcon.length; i++) {
-            const element = wechatIcon[i];
-            if ($(element).prev().length == 0) {
-                $(element).before('<i class="icon icon_payment_alipay" style="opacity:0;margin-right:4px"  title="Support BUFF Balance-Alipay"></i>');
-            }
         }
         // 检测是否支持这个类型/游戏的饰品
         let goods_id = getGoodsId();

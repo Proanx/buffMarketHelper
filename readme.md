@@ -1,4 +1,4 @@
-# [更新日志][commits]|[插件介绍](#intro)|[常见问题与解决办法](#support)
+# [更新日志][githubCommits]|[插件介绍](#intro)|[常见问题与解决办法](#support)
 <h3 style="color:#228b22">插件是免费的，用来省钱的，想用来赚钱的韭菜们可以继续开花</h3>
 <mark><i>注：buff与steam均有反爬机制，请节制使用</i></mark>
 
@@ -65,7 +65,7 @@
 5. **插件一直在转圈**  
    1. 同上
 6. **提示我无法连接steam/连接steam超时**
-   1. 挂加速器，确保**使用插件的浏览器可以正常访问steam市场**之后刷新页面或者点开设置页面检测连接性
+   1. 挂加速器、梯子，确保**使用插件的浏览器**可以正常访问[steam市场][steamMarket]之后刷新页面或者点开设置页面检测连接性
    2. 弹出访问授权窗口时请确认域名后选择允许（永久拒绝了就重装）  
    3. 打开设置检测连接性，成功连接的话会给出你的连接时间，如果已经接近20秒（20000ms）的话你应该考虑更换网络环境
 7. **我以前\*\*\*用的好好的，更新后就不行了**
@@ -79,7 +79,8 @@
 **需要私人订制插件、付费版/高级版的朋友可以直接省去加群的步骤**
 
 ---
-### 普通用户有改进建议可以进上面的QQ群私信给管理，对于开发者们，插件代码托管在[gitee][giteePage]上，可以直接发pr。
+
+### 普通用户有改进建议可以进上面的QQ群私信给管理，插件代码托管在[![fork](https://gitee.com/pronax/buffMarketHelper/badge/fork.svg?theme=dark)][giteePage]和[![GitHub forks](https://img.shields.io/github/forks/Proanx/buffMarketHelper?style=social)][githubPage]上，开发者们可以直接发pr。
 ### 不管你是普通人还是开发者，只要建议被采纳都会加进顶部的感谢名单！  ヽ(￣ω￣(￣ω￣〃)ゝ) 快来一起开发插件吧
 
 ### 如果你喜欢这个插件或者喜欢我本人，可以扫这里打赏↓  
@@ -89,10 +90,13 @@
 [contributors-bitaminkim]:https://keylol.com/forum.php?mod=viewthread&tid=731319
 [contributors-gearApp]:https://gear4.app/
 <!-- Link -->
+[steamMarket]:https://steamcommunity.com/market/
 [postFeedback]:https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion
 [emailMe]:mailto:funkyturkey@yeah.net?subject=%E8%BF%99%E9%87%8C%E6%9C%89%E4%B8%80%E4%B8%AAbug%E5%8F%8D%E9%A6%88/%E4%BF%AE%E6%94%B9%E5%BB%BA%E8%AE%AE
-[commits]:https://gitee.com/pronax/buffMarketHelper/commits/master
 [giteePage]:https://gitee.com/pronax/buffMarketHelper
+[giteeCommits]:https://gitee.com/pronax/buffMarketHelper/commits/master
+[githubPage]:https://github.com/Proanx/buffMarketHelper
+[githubCommits]:https://github.com/Proanx/buffMarketHelper/commits/master
 [qqGroup1]:https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 [qqGroup2]:https://jq.qq.com/?_wv=1027&k=98pr2kNH
 <!-- Image -->

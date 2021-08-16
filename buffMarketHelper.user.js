@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.17
-// @note            更新于2021年8月13日15:58:12
+// @version         2.4.18
+// @note            更新于2021年8月16日20:44:06
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -135,7 +135,7 @@
         $(".detail-cont").css("margin-left", 0);
 
         $(document).ajaxSuccess(function (event, status, header, result) {
-            if (/^\/api\/market\/goods\/sell_order/.exec(header.url) && result.data && result.data.total_count) {
+            if (/^\/api\/market\/goods\/sell_order/.exec(header.url) && result.data && result.data.goods_infos[getGoodsId()] && result.data.total_count) {
                 steamFailedTimes = 0;
                 buffHelperModule_inspestEnhancementCsgo(result.data);
                 buffHelperGoodsDetailScale(result.data);
@@ -466,7 +466,7 @@
         }
         // 检测是否支持这个类型/游戏的饰品
         let goods_id = getGoodsId();
-        if (data.goods_infos[goods_id].appid != 730 || data.total_count == 0 || enhancement_support_list.indexOf(data.goods_infos[goods_id].tags.category_group.internal_name) < 0) { return; }
+        if (data.goods_infos[goods_id].appid != 730 || enhancement_support_list.indexOf(data.goods_infos[goods_id].tags.category_group.internal_name) < 0) { return; }
         // 英文页面标志
         let isEn = $("#j_lang-switcher").data("current") === "en";
         // 整体CSS

@@ -18,7 +18,7 @@
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
 // @grant           GM_registerMenuCommand
-// @require         https://greasyfork.org/scripts/430098-alihesari-s-notice-js-0-4-0/code/alihesari's%20noticejs%20040.js?version=955717
+// @require         https://greasyfork.org/scripts/430098-alihesari-s-notice-js-0-4-0/code/alihesari's%20noticejs%20040.js?version=962278
 // @connect         steamcommunity.com
 // @connect         esapi.isthereanydeal.com
 // ==/UserScript==

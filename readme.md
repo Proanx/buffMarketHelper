@@ -83,7 +83,7 @@
 
 ---
 
-### 普通用户有改进建议可以进上面的QQ群私信给管理，插件代码托管在[![fork](https://gitee.com/pronax/buffMarketHelper/badge/fork.svg?theme=dark)][giteePage]和[![GitHub forks](https://img.shields.io/github/forks/Proanx/buffMarketHelper?style=social)][githubPage]上，开发者们可以直接发pr。
+### 普通用户有改进建议可以进上面的QQ群私信给管理，插件代码托管在[![GitHub](https://img.shields.io/github/forks/Proanx/buffMarketHelper?style=social)][githubPage]。也有副本在[![Gitee](https://gitee.com/pronax/buffMarketHelper/badge/fork.svg?theme=dark)][giteePage]，不过是**手动同步，可能会慢几个commit**，开发者们可以直接发pr。
 ### 不管你是普通人还是开发者，只要建议被采纳都会加进顶部的感谢名单！  ヽ(￣ω￣(￣ω￣〃)ゝ) 快来一起开发插件吧
 
 ### 如果你喜欢这个插件或者喜欢我本人，可以扫这里打赏↓  

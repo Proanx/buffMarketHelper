@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.18
-// @note            更新于2021年8月16日20:44:06
+// @version         2.4.19
+// @note            更新于2021年8月22日15:20:44
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -33,19 +33,19 @@
 
     // 全局（插件环境）异常捕获
     window.onerror = function (e) {
+        // e.returnValue = false;       值为false时不会触发console.error事件
         // 通常是浏览器内各种原因导致的报错
         if (!e.error) { return; }
         let scriptName = undefined;
-        // 也许可以用来区分scriptManager，但是现在用不上
-        // let errorType = undefined;
-        let renderingEngine = e.error.stack.match(/([^\s(@]*)-extension/)[1];
-        switch (renderingEngine) {
-            case "chrome":
+        // let errorType = undefined;   也许可以用来区分scriptManager，但是现在用不上
+        let renderingEngine = window.navigator.userAgent.match(/(Chrome|Firefox)\/([^ ]*)/);
+        switch (renderingEngine && renderingEngine[1]) {
+            case "Chrome":
                 // chrome+TamperMonkey在这个脚本内报错的情况下会需要两次decode
                 scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/([^\/=]*)\.user\.js/)[1]));
                 // errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
                 break;
-            case "moz":
+            case "Firefox":
                 scriptName = decodeURIComponent(e.error.stack.match(/\/([^\/]*)\.user\.js/)[1]).trim();
                 // errorType = e.message.match(/^([a-zA-Z]*): /)[1];
                 break;
@@ -56,10 +56,11 @@
             let lineno = e.lineno - 535;   // 常量不一定准确
             let colno = e.colno;
             let errorMsg = e.error.message;
-            let msgHtml = `恭喜！你可能发现了一个bug<hr/>浏览器内核：${renderingEngine}<br/>插件版本：${GM_info.script.version}<br/>位置：${lineno}:${colno}<br/>错误信息：${errorMsg}<br/>路径：${location.pathname}<p>哈希：${location.hash}</p><hr/>点击下面的链接可以直接进行反馈<br/><a class="noticejs-link" href='mailto:funkyturkey@yeah.net?subject=${renderingEngine}${GM_info.script.version} ${lineno}:${colno} ${errorMsg}&body=${encodeURIComponent(location.href)}'>邮件反馈</a><a class="noticejs-link" href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a class="noticejs-link" href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
-            showMessage("出现了意料之外的错误", msgHtml, "error", 300);
+            let msgBody = `内核：${renderingEngine[0]}<br/>版本：${GM_info.script.version}<br/>位置：${lineno}:${colno}<br/>信息：${errorMsg}<br/>路径：${location.pathname}<br/>哈希：${location.hash}`;
+            let msgHtml = `恭喜！你可能发现了一个bug<hr/>${msgBody}<hr/>点击下面的链接可以直接进行反馈<br/><a class="noticejs-link" href='mailto:funkyturkey@yeah.net?subject=${GM_info.script.version} ${errorMsg}&body=${encodeURIComponent(msgBody.replaceAll("<br/>", "\r\n"))}'>邮件反馈</a><a class="noticejs-link" href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a class="noticejs-link" href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
+            showMessage("出现了意料之外的错误", msgHtml, "error", 350);
         } else {
-            console.log(`插件名称：${scriptName}\n浏览器内核：${renderingEngine}\n行号：${e.lineno}\n列号：${e.colno}\n错误信息：${e.message}`);
+            console.log(`插件名称：${scriptName}\n代码位置：${e.lineno}:${e.colno}\n错误信息：${e.message}`);
         }
     }
 
@@ -219,51 +220,48 @@
             let steam_price_without_fee = 0;            // steam卖出实收   
             let error = false;
             let pm = new Promise(function (resolve, reject) {
-                if (isFirstTime) {
-                    getSteamSoldNumber(app_id, hash_name).then(function onFulfilled(json) {
-                        if (!json.volume) { json.volume = 0; }
-                        $(".detail-cont").append(`<div id="steam_sold">有 <span class="market_commodity_orders_header_promote">${json.volume}</span> 份在 24 小时内售出</div>`);
-                    }).catch(err => {
-                        $(".detail-cont").append(`<div id="steam_sold_error">获取steam销量失败，原因：${err.statusText}</div>`);
-                    });
-                    getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
-                        steam_highest_buy_order_detail = exchangeRateToCNY(json.highest_buy_order / 100);
-                        steam_lowest_sell_order_detail = exchangeRateToCNY(json.lowest_sell_order / 100);
-                        $(".detail-cont").append("<div id='steam_order'>" + json.buy_order_summary + "</div>");
-                        $(".detail-pic").after(json.buy_order_table);
-                        if (helper_config.orderFloatLeft) {
-                            $(".market_commodity_orders_table").css({
-                                "margin": "0 10px 0 0",
-                                "float": "left"
-                            });
-                        }
-                    }).catch(function onRejected(err) {
-                        switch (err.status) {
-                            case 429:
-                                steamConnection = true;
-                                err.statusText = "请求次数过多";
-                                break;
-                            case 500:
-                                if (!secendTry) {
-                                    error = true;
-                                    reject();
-                                    return;
-                                }
-                                err.statusText = "内部服务器错误，请稍后重试";
-                                break;
-                            case 0:
-                                failedSteamConnection();
-                            case 408:
-                                err.statusText = "访问steam超时，请检查steam市场连接性";
-                                break;
-                        }
-                        $(".detail-cont").append("<div id='steam_order_error'>" + err.statusText + "</div>");
-                    }).finally(() => {
-                        resolve();
-                    });
-                } else {
-                    reject();
-                }
+                if (!isFirstTime) { reject(); }
+                getSteamSoldNumber(app_id, hash_name).then(function onFulfilled(json) {
+                    if (!json.volume) { json.volume = 0; }
+                    $(".detail-cont").append(`<div id="steam_sold">有 <span class="market_commodity_orders_header_promote">${json.volume}</span> 份在 24 小时内售出</div>`);
+                }).catch(err => {
+                    $(".detail-cont").append(`<div id="steam_sold_error">获取steam销量失败，原因：${err.statusText}</div>`);
+                });
+                getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
+                    steam_highest_buy_order_detail = exchangeRateToCNY(json.highest_buy_order / 100);
+                    steam_lowest_sell_order_detail = exchangeRateToCNY(json.lowest_sell_order / 100);
+                    $(".detail-cont").append("<div id='steam_order'>" + json.buy_order_summary + "</div>");
+                    $(".detail-pic").after(json.buy_order_table);
+                    if (helper_config.orderFloatLeft) {
+                        $(".market_commodity_orders_table").css({
+                            "margin": "0 10px 0 0",
+                            "float": "left"
+                        });
+                    }
+                }).catch(function onRejected(err) {
+                    switch (err.status) {
+                        case 429:
+                            steamConnection = true;
+                            err.statusText = "请求次数过多";
+                            break;
+                        case 500:
+                            if (!secendTry) {
+                                error = true;
+                                reject();
+                                return;
+                            }
+                            err.statusText = "内部服务器错误，请稍后重试";
+                            break;
+                        case 0:
+                            failedSteamConnection();
+                        case 408:
+                            err.statusText = "访问steam超时，请检查steam市场连接性";
+                            break;
+                    }
+                    $(".detail-cont").append("<div id='steam_order_error'>" + err.statusText + "</div>");
+                }).finally(() => {
+                    resolve();
+                });
             });
             pm.catch(e => { }).finally(function onFulfilled() {
                 if (error) {

@@ -3,7 +3,7 @@
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
 // @version         2.4.19
-// @note            更新于2021年8月22日15:20:44
+// @note            更新于2021年8月27日16:45:51
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -220,7 +220,7 @@
             let steam_price_without_fee = 0;            // steam卖出实收   
             let error = false;
             let pm = new Promise(function (resolve, reject) {
-                if (!isFirstTime) { reject(); }
+                if (!isFirstTime) { reject(); return; }
                 getSteamSoldNumber(app_id, hash_name).then(function onFulfilled(json) {
                     if (!json.volume) { json.volume = 0; }
                     $(".detail-cont").append(`<div id="steam_sold">有 <span class="market_commodity_orders_header_promote">${json.volume}</span> 份在 24 小时内售出</div>`);

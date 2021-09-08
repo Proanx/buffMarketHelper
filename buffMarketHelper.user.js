@@ -17,7 +17,6 @@
 // @grant           GM_setValue
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
-// @grant      		GM_getResourceText
 // @grant           GM_registerMenuCommand
 // @require         https://cdn.bootcdn.net/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js
 // @connect         steamcommunity.com
@@ -35,8 +34,7 @@
     // 全局（插件环境）异常捕获
     window.onerror = function (e) {
         // e.returnValue = false;       值为false时不会触发console.error事件
-        // 通常是浏览器内各种原因导致的报错
-        if (!e.error) { return; }
+        if (!e.error) { return; }     // 通常是浏览器内各种原因导致的报错
         let scriptName = undefined;
         // let errorType = undefined;   也许可以用来区分scriptManager，但是现在用不上
         let renderingEngine = window.navigator.userAgent.match(/(Chrome|Firefox)\/([^ ]*)/);

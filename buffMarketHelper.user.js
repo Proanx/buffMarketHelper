@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.21
-// @note            更新于2021年9月21日14:18:16
+// @version         2.4.22
+// @note            更新于 2021年9月24日13:32:47
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -38,25 +38,27 @@
         let scriptName = undefined;
         // let errorType = undefined;   也许可以用来区分scriptManager，但是现在用不上
         let renderingEngine = window.navigator.userAgent.match(/(Chrome|Firefox)\/([^ ]*)/);
+        let lineno = e.lineno;
         switch (renderingEngine && renderingEngine[1]) {
             case "Chrome":
                 // chrome+TamperMonkey在这个脚本内报错的情况下会需要两次decode
                 scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/([^\/=]*)\.user\.js/)[1]));
+                lineno -= 535;
                 // errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
                 break;
             case "Firefox":
                 scriptName = decodeURIComponent(e.error.stack.match(/\/([^\/]*)\.user\.js/)[1]).trim();
+                lineno -= 2;
                 // errorType = e.message.match(/^([a-zA-Z]*): /)[1];
                 break;
             default:
                 return;
         }
         if (scriptName == "网易BUFF价格比例(找挂刀)插件") {
-            let lineno = e.lineno - 535;   // 常量不一定准确，负值说明问题出在require上，因为有meta块所以require的行号要加上10
             let colno = e.colno;
             let errorMsg = e.error.message;
             let msgBody = `内核：${renderingEngine[0]}<br/>版本：${GM_info.script.version}<br/>位置：${lineno}:${colno}<br/>信息：${errorMsg}<br/>路径：${location.pathname}<br/>哈希：${location.hash}`;
-            let msgHtml = `恭喜！你可能发现了一个bug<hr/>${msgBody}<hr/>点击下面的链接可以直接进行反馈<br/><a href='mailto:funkyturkey@yeah.net?subject=${GM_info.script.version} ${errorMsg}&body=${encodeURIComponent(msgBody.replaceAll("<br/>", "\r\n"))}'>邮件反馈</a><a href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
+            let msgHtml = `恭喜！你可能发现了一个bug<hr/>${msgBody}<hr/>点击下面的链接可以直接进行反馈<br/><a href='mailto:funkyturkey@yeah.net?subject=【${GM_info.script.version}】${lineno}:${colno} ${errorMsg}&body=${encodeURIComponent(msgBody.replaceAll("<br/>", "\r\n"))}'>邮件反馈</a><a href="https://jq.qq.com/?_wv=1027&k=98pr2kNH" target="_blank">QQ群反馈</a><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
             showMessage("出现了意料之外的错误", msgHtml, "error", false);
         } else {
             console.log(`插件名称：${scriptName}\n代码位置：${e.lineno}:${e.colno}\n错误信息：${e.message}`);
@@ -98,12 +100,11 @@
         steamCurrency: "CNY",
         currencyEffectCalculate: false,
     };
-    var steam_lowest_sell_order_detail = 0;     // 商品详情页专用-steam最低出售价
-    var steam_highest_buy_order_detail = 0;     // 商品详情页专用-steam最高求购价
     var helper_config = loadConfig();
     var displayCurrency;
     var steamCurrency;
     var exchangeRateList = GM_getValue("exchangeRateList");
+    var ajaxTimeout = 20000;
     var steamConnection = undefined;
     var steamFailedTimes = 0;
     var market_color_high = [];
@@ -229,8 +230,9 @@
             let app_id = data.goods_infos[buff_item_id].appid;
             let hash_name = encodeURIComponent(data.goods_infos[buff_item_id].market_hash_name);
             let items = data.items;
-            let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny;
-            let steam_price_without_fee = 0;            // steam卖出实收   
+            let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny * 100;
+            let steam_lowest_sell_order = 0;     // 商品详情页专用-steam最低出售价
+            let steam_highest_buy_order = 0;     // 商品详情页专用-steam最高求购价
             let error = false;
             let pm = new Promise(function (resolve, reject) {
                 if (!isFirstTime) { reject(); return; }
@@ -241,9 +243,15 @@
                     $(".detail-cont").append(`<div id="steam_sold_error">获取steam销量失败，原因：${err.statusText}</div>`);
                 });
                 getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
-                    steam_highest_buy_order_detail = json.highest_buy_order;
-                    steam_lowest_sell_order_detail = json.lowest_sell_order;
-                    $(".detail-cont").append("<div id='steam_order'>" + json.buy_order_summary + "</div>");
+                    steam_highest_buy_order = {
+                        origin: json.highest_buy_order,
+                        cny: FtoC(json.highest_buy_order)
+                    };
+                    steam_lowest_sell_order = {
+                        origin: json.lowest_sell_order,
+                        cny: FtoC(json.lowest_sell_order)
+                    };
+                    $(".detail-cont").append(`<div id='steam_order'>${json.buy_order_summary}</div>`);
                     $(".detail-pic").after(json.buy_order_table);
                     if (helper_config.orderFloatLeft) {
                         $(".market_commodity_orders_table").css({
@@ -283,11 +291,14 @@
                 }
                 $(".helper-loading").remove();
                 $(".detail-tab-cont th:last").before('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
-                let lowest_price = steam_lowest_sell_order_detail ? steam_lowest_sell_order_detail : steam_price_cny;
-                $(".f_Strong .hide-usd")[0].innerText = getWithoutFeePrice(lowest_price, 1);
+                if (steam_lowest_sell_order) {
+                    $(".f_Strong .hide-usd")[0].innerText = getWithoutFeePrice(steam_lowest_sell_order.origin, 1);
+                } else {
+                    $(".f_Strong .hide-usd")[0].innerText = getWithoutFeePrice(steam_price_cny, 1, "CNY");
+                }
                 for (let i = 0; i < items.length; i++) {
                     let buff_sell_price = items[i].price;
-                    let scale = getScale(buff_sell_price, lowest_price);
+                    let scale = getScale(buff_sell_price, steam_lowest_sell_order ? steam_lowest_sell_order.cny : steam_price_cny);
                     if (scale === Infinity) {
                         scale = "∞";
                     }
@@ -302,7 +313,7 @@
                         }
                         if (isFirstTime) {
                             $(".steam-link").prop("href", $(".steam-link").prop("href") + "?buffPrice=" + buff_sell_price);
-                            $(".market_commodity_orders_header_promote:last").after(`<small class='market_listing_price_with_fee'>${getScale(buff_sell_price, steam_highest_buy_order_detail)}</small>`);
+                            $(".market_commodity_orders_header_promote:last").after(`<small class='market_listing_price_with_fee'>${getScale(buff_sell_price, steam_highest_buy_order.cny)}</small>`);
                             $(price_list[isLogined ? 1 : 0]).append($(`<big class='good_scale' style='color:${color};margin-left: 6px'>${scale}</big>`));
                             // 求购表格
                             $(".market_commodity_orders_table th:first").after("<th>比例</th>");
@@ -310,22 +321,22 @@
                             for (let i = 1; i < orderList.length; i++) {
                                 let td = $(orderList[i]).find("td:first");
                                 let priceGroup = convertPrice(td.text());
-                                td.after(`<td>${getScale(buff_sell_price, priceGroup[1] + priceGroup[3])}</td>`);
+                                td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3]))}</td>`);
                             }
                         } else {
                             $(".steam-link").prop("href", $(".steam-link").prop("href").replace(/\d{0,6}[.]?\d{0,2}$/, buff_sell_price));
                             $(".good_scale").text(scale).css("color", color);
-                            $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order_detail));
+                            $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order.cny));
                             // 求购表格
                             let orderList = $(".market_commodity_orders_table tr");
                             for (let i = 1; i < orderList.length; i++) {
                                 let td = $(orderList[i]).find("td:first");
                                 let priceGroup = convertPrice(td.text());
-                                $(orderList[i]).find("td:nth-child(2)").text(getScale(buff_sell_price, priceGroup[1] + priceGroup[3]));
+                                $(orderList[i]).find("td:nth-child(2)").text(getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3])));
                             }
                         }
                     }
-                    $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after(`<td class="t_Left"><div style="display:table-cell;text-align:center;"><b class="seller_scale">${scale}</b><p class="c_Gray f_12px">${steam_highest_buy_order_detail ? getScale(buff_sell_price, steam_highest_buy_order_detail) : ''}</p></div></td>`);
+                    $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after(`<td class="t_Left"><div style="display:table-cell;text-align:center;"><b class="seller_scale">${scale}</b><p class="c_Gray f_12px">${steam_highest_buy_order ? getScale(buff_sell_price, steam_highest_buy_order.cny) : ''}</p></div></td>`);
                 }
                 daemonThread();
             });
@@ -354,22 +365,28 @@
         function marketListLoadData(item, good, randomID, secendTry) {
             let target = $(good).find("p>strong.f_Strong")[0];
             let error = false;
-            let buff_item_id = item.id;                                 // buff商品ID
-            let buff_buy_num = item.buy_num;                            // buff求购数量
-            let buff_buy_max_price = item.buy_max_price;                // buff求购最高价
-            let buff_sell_num = item.sell_num;                          // buff出售数量
-            let buff_sell_min_price = item.sell_min_price;              // buff出售最低价
-            let steam_price_cny = item.goods_info.steam_price_cny;      // buff提供的steam国区售价
-            let steam_market_url = item.steam_market_url;               // steam市场链接
-            let buff_sell_reference_price = item.sell_reference_price;  // buff出售参考价(没卵用)
-            let steam_highest_buy_order = 0;                            // steam最高求购价
-            let steam_lowest_sell_order = 0;                            // steam最低出售价
+            let buff_item_id = item.id;                                     // buff商品ID
+            let buff_buy_num = item.buy_num;                                // buff求购数量
+            let buff_buy_max_price = item.buy_max_price;                    // buff求购最高价
+            let buff_sell_num = item.sell_num;                              // buff出售数量
+            let buff_sell_min_price = item.sell_min_price;                  // buff出售最低价
+            let steam_price_cny = item.goods_info.steam_price_cny * 100;    // buff提供的steam国区售价
+            let steam_market_url = item.steam_market_url;                   // steam市场链接
+            let buff_sell_reference_price = item.sell_reference_price;      // buff出售参考价(没卵用)
+            let steam_highest_buy_order = 0;                                // steam最高求购价
+            let steam_lowest_sell_order = 0;                                // steam最低出售价
             $(good).attr("data-order-sort", Infinity);
             getSteamOrderList(buff_item_id, steam_market_url).then(function onFulfilled(json) {
-                steam_highest_buy_order = json.highest_buy_order;
-                steam_lowest_sell_order = json.lowest_sell_order;
+                steam_highest_buy_order = {
+                    origin: json.highest_buy_order,
+                    cny: FtoC(json.highest_buy_order)
+                };
+                steam_lowest_sell_order = {
+                    origin: json.lowest_sell_order,
+                    cny: FtoC(json.lowest_sell_order)
+                };
                 let orderNumber = $(json.buy_order_summary)[0].innerText;
-                let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order);
+                let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order.cny);
                 $(good).attr("data-order-sort", steamOrderScale);
                 $(target).after($(steamOrderNumberTemp).text(orderNumber + "┊"));
                 paintingGradient(steamOrderScale, target, 4, steamOrderScaleTemp);
@@ -397,9 +414,8 @@
                     marketListLoadData(item, good, randomID, true);
                     return;
                 }
-                let lowest_sell_price = steam_lowest_sell_order ? steam_lowest_sell_order : steam_price_cny;
-                let withoutFeePrice = getWithoutFeePrice(lowest_sell_price);
-                let scale = getScale(buff_sell_min_price, lowest_sell_price);
+                let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order.origin : steam_price_cny);
+                let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order.cny : steam_price_cny);
                 $(good).attr("data-buff-sort", scale);
                 if (scale === Infinity) {
                     withoutFeePrice = "";
@@ -412,20 +428,21 @@
                     while (strLenth > limit) {
                         switch (tryMe++) {
                             case 0:     // 0/1
-                                withoutFeePrice = Math.round(withoutFeePrice * 10) / 10;
+                                withoutFeePrice = (+withoutFeePrice).toFixed(1);
                                 break;
                             case 1:     // 0/2
                                 withoutFeePrice = Math.round(withoutFeePrice);
                                 break;
                             case 2:     // 0/1
-                                scale = Math.round(scale * 10) / 10;
+                                scale = (+scale).toFixed(1);
                                 break;
                             case 3:     // 0/3
-                                $(target).text(displayPrice[1] + Math.ceil(displayPrice[2]));
-                                displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
+                                let text = displayPrice[1] + Math.ceil(displayPrice[2]);    // 价格抹零
+                                $(target).text(text);
+                                displayPrice = text.match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
                                 break;
                             case 4:     // 0/2
-                                scale = Math.round(scale);
+                                scale = Math.ceil(scale);
                                 break;
                             case 5:     // no one's gonna know
                                 // $(target).text("0x" + parseInt(displayPrice[3]).toString(16));
@@ -560,7 +577,7 @@
             $.ajax({
                 url: "/market/item_detail",
                 method: "get",
-                timeout: 20000,
+                timeout: ajaxTimeout,
                 data: data,
                 success: function (data) {
                     let result = $(data)[0];
@@ -829,7 +846,7 @@
         steamConnection = undefined;
         GM_xmlhttpRequest({
             url: "https://steamcommunity.com/market/",
-            timeout: 20000,
+            timeout: ajaxTimeout,
             method: "get",
             onloadstart: function (event) {
                 countdown(19);
@@ -943,19 +960,32 @@
         return str.match(/(\d+)(\.(\d{1,2}))?/);
     }
 
-    function addCurrencySymbol(origin) {
-        if (steamCurrency.bSymbolIsPrefix) {
-            return steamCurrency.strSymbol + steamCurrency.strSymbolAndNumberSeparator + origin;
+    function addCurrencySymbol(origin, currencyCode) {
+        let currencyData = g_rgCurrencyData[currencyCode];
+        if (currencyData.bSymbolIsPrefix) {
+            return currencyData.strSymbol + currencyData.strSymbolAndNumberSeparator + origin;
         } else {
-            return origin + steamCurrency.strSymbolAndNumberSeparator + steamCurrency.strSymbol;
+            return origin + currencyData.strSymbolAndNumberSeparator + currencyData.strSymbol;
         }
     }
 
-    function getScale(sellerPrice, buyerPrice) {
+    // Foreign exchange to Chinese Yuan
+    function FtoC(valueInCents) {
         if (steamCurrency.eCurrencyCode != 23 && (!helper_config.currencyEffectCalculate)) {
-            buyerPrice = buyerPrice * exchangeRateList[steamCurrency.strCode].CNY;
+            return valueInCents * exchangeRateList[steamCurrency.strCode].CNY;
         }
-        let amount = calculateFeeAmount(buyerPrice);
+        return valueInCents;
+    }
+    // Chinese Yuan to Foreign exchange
+    function CtoF(valueInCents) {
+        if (steamCurrency.eCurrencyCode != 23 && (!helper_config.currencyEffectCalculate)) {
+            return valueInCents / exchangeRateList[steamCurrency.strCode].CNY;
+        }
+        return valueInCents;
+    }
+
+    function getScale(sellerPrice, buyerPriceInCents) {
+        let amount = calculateFeeAmount(buyerPriceInCents);
         return (sellerPrice / v_currencyformat(amount.amount - amount.fees)).toFixed(2);
     }
 
@@ -964,15 +994,15 @@
     // 0: 49078.56                  convert to float  
     // 1: ARS$ 49078.56             float with symbol
     // 2: ARS$ 49.078,56            locale string
-    function getWithoutFeePrice(originPrice, symbolType = 0) {
-        let amount = calculateFeeAmount(originPrice);
+    function getWithoutFeePrice(originPriceInCents, symbolType = 0, currencyCode = steamCurrency.strCode) {
+        let amount = calculateFeeAmount(originPriceInCents);
         switch (symbolType) {
             case 0:
                 return v_currencyformat(amount.amount - amount.fees);
             case 1:
-                return addCurrencySymbol(v_currencyformat(amount.amount - amount.fees));
+                return addCurrencySymbol(v_currencyformat(amount.amount - amount.fees), currencyCode);
             case 2:
-                return v_currencyformat(amount.amount - amount.fees, steamCurrency.strCode);
+                return v_currencyformat(amount.amount - amount.fees, currencyCode);
         }
     }
 
@@ -1141,7 +1171,7 @@
             }
             GM_xmlhttpRequest({
                 url: steamLink,
-                timeout: 20000,
+                timeout: ajaxTimeout,
                 method: "get",
                 onload: function (res) {
                     if (res.status == 200) {
@@ -1188,7 +1218,7 @@
             getItemId(buff_item_id, steamLink).then(function onFulfilled(steam_item_id) {
                 GM_xmlhttpRequest({
                     url: `https://steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=${steamCurrency.eCurrencyCode}&item_nameid=${steam_item_id}&two_factor=0`,
-                    timeout: 20000,
+                    timeout: ajaxTimeout,
                     method: "get",
                     onload: function (res) {
                         if (res.status == 200) {
@@ -1225,7 +1255,7 @@
             }
             GM_xmlhttpRequest({
                 url: `https://steamcommunity.com/market/priceoverview/?appid=${app_id}&currency=${steamCurrency.eCurrencyCode}&market_hash_name=${hash_name}`,
-                timeout: 20000,
+                timeout: ajaxTimeout,
                 method: "get",
                 onload: function (res) {
                     if (res.status == 200) {

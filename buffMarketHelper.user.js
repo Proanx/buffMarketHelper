@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.22
-// @note            更新于 2021年9月24日13:32:47
+// @version         2.4.23
+// @note            更新于 2021年9月24日14:02:19
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -243,11 +243,11 @@
                     $(".detail-cont").append(`<div id="steam_sold_error">获取steam销量失败，原因：${err.statusText}</div>`);
                 });
                 getSteamOrderList(buff_item_id, steamLink).then(function onFulfilled(json) {
-                    steam_highest_buy_order = {
+                    steam_highest_buy_order = json.highest_buy_order && {
                         origin: json.highest_buy_order,
                         cny: FtoC(json.highest_buy_order)
                     };
-                    steam_lowest_sell_order = {
+                    steam_lowest_sell_order = json.lowest_sell_order && {
                         origin: json.lowest_sell_order,
                         cny: FtoC(json.lowest_sell_order)
                     };
@@ -377,11 +377,11 @@
             let steam_lowest_sell_order = 0;                                // steam最低出售价
             $(good).attr("data-order-sort", Infinity);
             getSteamOrderList(buff_item_id, steam_market_url).then(function onFulfilled(json) {
-                steam_highest_buy_order = {
+                steam_highest_buy_order = json.highest_buy_order && {
                     origin: json.highest_buy_order,
                     cny: FtoC(json.highest_buy_order)
                 };
-                steam_lowest_sell_order = {
+                steam_lowest_sell_order = json.lowest_sell_order && {
                     origin: json.lowest_sell_order,
                     cny: FtoC(json.lowest_sell_order)
                 };
@@ -445,7 +445,7 @@
                                 scale = Math.ceil(scale);
                                 break;
                             case 5:     // no one's gonna know
-                                // $(target).text("0x" + parseInt(displayPrice[3]).toString(16));
+                                // $(target).text("0x" + (+displayPrice[3]).toString(16));
                                 // withoutFeePrice = withoutFeePrice.toString(16);
                                 withoutFeePrice = "";
                                 strLenth = 0;

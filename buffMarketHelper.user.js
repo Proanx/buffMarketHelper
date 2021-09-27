@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.24
-// @note            更新于 2021年9月27日02:14:33
+// @version         2.4.25
+// @note            更新于 2021年9月28日00:19:19
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -259,6 +259,27 @@
                     };
                     $(".detail-cont").append(`<div id='steam_order'>${json.buy_order_summary}</div>`);
                     $(".detail-pic").after(json.buy_order_table);
+                    let buff_sell_price = data.items[0].price;
+                    if (isFirstTime) {
+                        $(".market_commodity_orders_header_promote:last").after(`<small class='market_listing_price_with_fee'>${getScale(buff_sell_price, steam_highest_buy_order.cny)}</small>`);
+                        // 求购表格
+                        $(".market_commodity_orders_table th:first").after("<th>比例</th>");
+                        let orderList = $(".market_commodity_orders_table tr");
+                        for (let i = 1; i < orderList.length; i++) {
+                            let td = $(orderList[i]).find("td:first");
+                            let priceGroup = convertPrice(td.text());
+                            td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3]))}</td>`);
+                        }
+                    } else {
+                        $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order.cny));
+                        // 求购表格
+                        let orderList = $(".market_commodity_orders_table tr");
+                        for (let i = 1; i < orderList.length; i++) {
+                            let td = $(orderList[i]).find("td:first");
+                            let priceGroup = convertPrice(td.text());
+                            $(orderList[i]).find("td:nth-child(2)").text(getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3])));
+                        }
+                    }
                     if (helper_config.orderFloatLeft) {
                         $(".market_commodity_orders_table").css({
                             "margin": "0 10px 0 0",
@@ -319,27 +340,10 @@
                         }
                         if (isFirstTime) {
                             $(".steam-link").prop("href", $(".steam-link").prop("href") + "?buffPrice=" + buff_sell_price);
-                            $(".market_commodity_orders_header_promote:last").after(`<small class='market_listing_price_with_fee'>${getScale(buff_sell_price, steam_highest_buy_order.cny)}</small>`);
                             $(price_list[isLogined ? 1 : 0]).append($(`<big class='good_scale' style='color:${color};margin-left: 6px'>${scale}</big>`));
-                            // 求购表格
-                            $(".market_commodity_orders_table th:first").after("<th>比例</th>");
-                            let orderList = $(".market_commodity_orders_table tr");
-                            for (let i = 1; i < orderList.length; i++) {
-                                let td = $(orderList[i]).find("td:first");
-                                let priceGroup = convertPrice(td.text());
-                                td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3]))}</td>`);
-                            }
                         } else {
                             $(".steam-link").prop("href", $(".steam-link").prop("href").replace(/\d{0,6}[.]?\d{0,2}$/, buff_sell_price));
                             $(".good_scale").text(scale).css("color", color);
-                            $(".market_listing_price_with_fee").text(getScale(buff_sell_price, steam_highest_buy_order.cny));
-                            // 求购表格
-                            let orderList = $(".market_commodity_orders_table tr");
-                            for (let i = 1; i < orderList.length; i++) {
-                                let td = $(orderList[i]).find("td:first");
-                                let priceGroup = convertPrice(td.text());
-                                $(orderList[i]).find("td:nth-child(2)").text(getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3])));
-                            }
                         }
                     }
                     $(price_list[i + (isLogined ? 2 : 1)]).parents("td").after(`<td class="t_Left"><div style="display:table-cell;text-align:center;"><b class="seller_scale">${scale}</b><p class="c_Gray f_12px">${steam_highest_buy_order ? getScale(buff_sell_price, steam_highest_buy_order.cny) : ''}</p></div></td>`);

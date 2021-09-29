@@ -3,7 +3,7 @@
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
 // @version         2.4.27
-// @note            更新于 2021年9月29日12:56:18
+// @note            更新于 2021年9月29日13:06:45
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -392,7 +392,7 @@
             }
             let displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/) || [""];
             let tryMe = 0;
-            while (strWidth > 192) {
+            while (strWidth >= 192) {
                 switch (tryMe++) {
                     // 超长以后显示的越少越好，所以不用toFixed以免出现小数是0的情况
                     case 0:     // 0/1

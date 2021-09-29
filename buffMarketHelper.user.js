@@ -654,7 +654,8 @@
             let val = target.getAttribute("value") ? target.getAttribute("value") : target.value;
             helper_config[optionTarget] = val;
             if (optionTarget == "steamCurrency" && g_rgCurrencyData[val].eCurrencyCode != 23) {
-                updateRate(1);
+                let toast = showMessage(`正在获取${val}的汇率`, "访问时间取决于steam访问速度，期间请不要关闭页面", "info", 20000);
+                updateRate(1, toast);
             } else {
                 GM_setValue("helper_config", helper_config);
             }
@@ -1107,7 +1108,7 @@
         return err;
     }
 
-    function updateRate(force) {
+    function updateRate(force, toast) {
         if ((!force) && exchangeRate && exchangeRate.time_next_update_unix > Date.now()) {
             return;
         }
@@ -1117,24 +1118,48 @@
         }
         GM_xmlhttpRequest({
             url: `https://steamcommunity.com/market/listings/730/Souvenir%20Sawed-Off%20|%20Snake%20Camo%20(Well-Worn)/render/?query=&start=40&count=100&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
+            // url: `https://steamcommunity.com/market/listings/730/AWP%20|%20Redline%20(Minimal%20Wear)/render/?start=0&count=30&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
             method: "get",
             timeout: ajaxTimeout,
             onload: function (response) {
+                toast.reset();
                 let data = response.status == 200 ? JSON.parse(response.responseText) : {};
-                if (data.success && data.listinginfo["3296062994072312107"].converted_currencyid % 2000 == g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode) {
+                if (data.success && data.listinginfo["3296062994072312107"]) {
+                    if (data.listinginfo["3296062994072312107"].converted_currencyid % 2000 != g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode) {
+                        return; // 对结果返回前的多次操作进行屏蔽，只取最后一次的结果
+                    }
                     let timeUnix = Date.now();
                     exchangeRate = {
-                        FtoC: (1000000 / data.listinginfo["3296062994072312107"].converted_price).toFixed(6),
-                        CtoF: (data.listinginfo["3296062994072312107"].converted_price / 1000000).toFixed(6),
+                        FtoC: (data.listinginfo["3296062994072312107"].price / data.listinginfo["3296062994072312107"].converted_price).toFixed(6),
+                        CtoF: (data.listinginfo["3296062994072312107"].converted_price / data.listinginfo["3296062994072312107"].price).toFixed(6),
                         currencyCode: g_rgCurrencyData[helper_config.steamCurrency].strCode,
                         time_next_update_unix: timeUnix + 10800000,
                         time_update_unix: timeUnix
                     }
                     GM_setValue("exchangeRate", exchangeRate);
                     GM_setValue("helper_config", helper_config);
-                    showMessage("更新汇率成功", "已经同步最新汇率", "success");
+                    showMessage("更新汇率成功", `已经同步${helper_config.steamCurrency}的最新汇率`, "success");
                     return;
                 }
+                // in case of emergency
+                // if (data.success) {
+                //     for (let key in data.listinginfo) {
+                //         if (data.listinginfo[key].currencyid == 2023) {
+                //             let timeUnix = Date.now();
+                //             exchangeRate = {
+                //                 FtoC: (data.listinginfo[key].price / data.listinginfo[key].converted_price).toFixed(6),
+                //                 CtoF: (data.listinginfo[key].converted_price / data.listinginfo[key].price).toFixed(6),
+                //                 currencyCode: g_rgCurrencyData[helper_config.steamCurrency].strCode,
+                //                 time_next_update_unix: timeUnix + 10800000,
+                //                 time_update_unix: timeUnix
+                //             }
+                //             GM_setValue("exchangeRate", exchangeRate);
+                //             GM_setValue("helper_config", helper_config);
+                // showMessage("更新汇率成功", `已经同步${helper_config.steamCurrency}的最新汇率`, "success");
+                //             return;
+                //         }
+                //     }
+                // }
                 console.log("更新汇率时错误：", response);
                 showMessage("更新汇率时错误", errorTranslator(response).statusText + "<br/>货币设置未保存", 'error');
             },

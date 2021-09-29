@@ -58,7 +58,8 @@
    3. 火狐不要使用Greasemonkey，改用Tampermonkey和Violentmonkey都可以
 5. **提示我请求次数过多**
    1. 拿<b style="color:red">使用插件的浏览器</b>登录网页版steam（账号须可交易）  
-   2. 登录账号以后依然提示，说明steam限制你访问了，休息一下吧
+   2. 加速器换个节点（IP）
+   3. 依然提示说明steam限制你访问了，休息一下吧
 6. **弹出Not a valid integer value**
    1. 打开右边设置，每页显示数量中填入1~80之间的整数（正常是20）。
 7. **一直提示bad request**  

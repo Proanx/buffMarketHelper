@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.26
-// @note            更新于 2021年9月29日00:24:32
+// @version         2.4.27
+// @note            更新于 2021年9月29日12:56:18
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -101,7 +101,6 @@
         currencyEffectCalculate: false,
     };
     var helper_config = loadConfig();
-    var displayCurrency;
     var steamCurrency;
     var exchangeRateList = GM_getValue("exchangeRateList");
     var ajaxTimeout = 20000;
@@ -122,10 +121,6 @@
     initCurrency();
     // 添加翻页和设置按钮，初始化部分数据
     initHelper();
-
-    $(function () {
-        displayCurrency = getDisplayCurrency();
-    })
 
     if (location.pathname.startsWith("/goods/")) {
         // 自带css
@@ -286,7 +281,7 @@
                 }
             }
             $(".helper-loading").remove();
-            $(".detail-tab-cont th:last").before('<th style="width: 45px;" class="t_Left"><span>比例<i class="icon icon_order"></i></span></th>');
+            $(".detail-tab-cont th:last").before('<th style="width: 45px;" class="t_Left"><span>比例</span></th>');
             if (steam_lowest_sell_order) {
                 $(".f_Strong .hide-usd")[0].innerText = getWithoutFeePrice(steam_lowest_sell_order.origin, 1);
             } else {
@@ -385,46 +380,50 @@
             let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order.origin : steam_price_cny);
             let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order.cny : steam_price_cny);
             $(good).attr("data-buff-sort", scale);
-            if (scale === Infinity) {
-                withoutFeePrice = "";
-                scale = "∞";
-            } else {
-                let limit = strLengthLimit[displayCurrency.strCode];
-                let displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/) || [""];
-                let strLenth = ("" + displayPrice[0] + withoutFeePrice + scale).length;
-                let tryMe = 0;
-                while (strLenth > limit) {
-                    switch (tryMe++) {
-                        case 0:     // 0/1
-                            withoutFeePrice = (+withoutFeePrice).toFixed(1);
-                            break;
-                        case 1:     // 0/2
-                            withoutFeePrice = Math.round(withoutFeePrice);
-                            break;
-                        case 2:     // 0/1
-                            scale = (+scale).toFixed(1);
-                            break;
-                        case 3:     // 0/3
-                            let text = displayPrice[1] + Math.ceil(displayPrice[2]);    // 价格抹零
-                            $(target).text(text);
-                            displayPrice = text.match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
-                            break;
-                        case 4:     // 0/2
-                            scale = Math.ceil(scale);
-                            break;
-                        case 5:     // no one's gonna know
-                            // $(target).text("0x" + (+displayPrice[3]).toString(16));
-                            // withoutFeePrice = withoutFeePrice.toString(16);
-                            withoutFeePrice = "";
-                            strLenth = 0;
-                            continue;
-                    }
-                    strLenth = ("" + displayPrice[0] + withoutFeePrice + scale).length;
-                }
-                // withoutFeePrice = addCurrencySymbol(withoutFeePrice);
-            }
+            $(target).prepend(`<span>${target.childNodes[0].textContent}</span>`);
+            target.childNodes[1].remove();
             $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
             paintingGradient(scale, target, 3);
+            withoutFeePrice = target.children[target.children.length - 2];
+            scale = target.children[target.children.length - 1];
+            let strWidth = 5;
+            for (let i = 0; i < target.children.length; i++) {
+                strWidth += target.children[i].offsetWidth;
+            }
+            let displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/) || [""];
+            let tryMe = 0;
+            while (strWidth > 192) {
+                switch (tryMe++) {
+                    // 超长以后显示的越少越好，所以不用toFixed以免出现小数是0的情况
+                    case 0:     // 0/1
+                        withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText * 10) / 10;
+                        break;
+                    case 1:     // 0/2
+                        withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText);
+                        break;
+                    case 2:     // 0/1
+                        scale.innerText = Math.round(scale.innerText * 10) / 10;
+                        break;
+                    case 3:     // 0/3
+                        let text = displayPrice[1] + Math.ceil(displayPrice[2]);    // 价格抹零
+                        $(target).text(text);
+                        displayPrice = text.match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
+                        break;
+                    case 4:     // 0/2
+                        scale.innerText = Math.ceil(scale.innerText);
+                        break;
+                    case 5:     // no one's gonna know
+                        // $(target).text((+displayPrice[3]).toString(16));
+                        // withoutFeePrice.innerText = withoutFeePrice.innerText.toString(16);
+                        withoutFeePrice.innerText = "";
+                        strWidth = 0;
+                        continue;
+                }
+                strWidth = 5;
+                for (let i = 0; i < target.children.length; i++) {
+                    strWidth += target.children[i].offsetWidth;
+                }
+            }
             if (needSort && (helper_config.sortAfterAllDone ? itemCount == itemNum - 1 : true)) {
                 let arr = needSort.split("_");
                 sortGoods("data-" + arr[0], arr[1] == "asc");
@@ -693,18 +692,6 @@
         helper_config = clone(defaultConfig);
         init();
         showMessage("重置成功", "插件已恢复初始设定", "info", 2000);
-    }
-
-    function getDisplayCurrency() {
-        // 美元符号是特殊字符。。。记得转义
-        let currencyList = { "¥-¥": "CNY", "\\$-\\$": "USD", "€-€": "EUR", "₽-₽": "RUB" };
-        let text = $(".w-Counter-input").text();
-        for (let key in currencyList) {
-            if (text.search(key) == 1) {
-                return g_rgCurrencyData[currencyList[key]];
-            }
-        }
-        return g_rgCurrencyData["CNY"];
     }
 
     function initCurrency() {

@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.29
-// @note            更新于 2021年9月29日20:26:31
+// @version         2.4.30
+// @note            更新于 2021年10月25日20:29:09
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -269,7 +269,7 @@
                         for (let i = 1; i < orderTableList.length; i++) {
                             let td = $(orderTableList[i]).find("td:first");
                             let priceGroup = convertPrice(td.text());
-                            td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + priceGroup[3]))}</td>`);
+                            td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + (priceGroup[3] || "00")))}</td>`);
                         }
                         if (helper_config.orderFloatLeft) {
                             $(".market_commodity_orders_table").addClass("order_float_left");

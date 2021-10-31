@@ -337,6 +337,10 @@
         $(".market-list .blank20:last").prepend('<div id=helper-progress-bar-' + randomID + ' class="helper-progress-bar"></div>');
         for (let i = 0; i < goods.length; i++) {
             $(goods[i]).attr("data-default-sort", i);
+            if (items[i].sell_num == 0) {
+                updateProgressBar(randomID);
+                continue;
+            }
             marketListLoadData(items[i], goods[i], randomID);
         }
 

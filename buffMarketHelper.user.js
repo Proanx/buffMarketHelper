@@ -2,7 +2,7 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.31
+// @version         2.4.32
 // @note            更新于 2021年10月27日17:37:43
 // @supportURL      https://jq.qq.com/?_wv=1027&k=98pr2kNH
 // @author          Pronax
@@ -157,6 +157,11 @@
             }
         });
     } else if (location.pathname.startsWith("/market/")) {
+        // 主要样式
+        GM_addStyle(".steam_temp{margin-top: inherit;}#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li{padding-bottom:0}.list_card li h3{margin: 4px 8px;}.list_card li p{margin: 6px 8px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}.price_scale{padding-top:2px}");
+        // 进度条样式
+        GM_addStyle(".helper-loading{position:absolute;margin:11px}.helper-progress-bar{height:20px;background:linear-gradient(130deg, rgb(33 86 183 / 61%) 20%, rgb(15 116 187 / 35%) 85%, transparent);width:0;z-index:1000}");
+
         $(document).ajaxSend(function (event, xhr, header, result) {
             if (/^\/api\/market\/goods/.exec(header.url)) {
                 header.url += "&page_size=" + helper_config.pageSize;
@@ -165,45 +170,6 @@
                 steamFailedTimes = 0;
             }
         });
-        // 主要样式
-        GM_addStyle(".steam_temp{margin-top: inherit;}#sort_scale{display:inline-block;padding:0 6px 0 16px;cursor:pointer;height:32px;margin-left:5px;line-height:32px;text-align:center;border-radius:4px;min-width:60px;border:1px solid #45536c;color:#63779b;vertical-align:middle}#sort_scale.enabled{background:#45536c;color:#fff}.list_card li{padding-bottom:0}.list_card li h3{margin: 4px 8px;}.list_card li p{margin: 6px 8px;}.list_card li>p>span.l_Left{margin-top:inherit}.list_card li>p>strong.f_Strong{display:block;font-size:20px;min-height:20px;}.price_scale{padding-top:2px}");
-        // 进度条样式
-        GM_addStyle(".helper-loading{position:absolute;margin:11px}.helper-progress-bar{height:20px;background:linear-gradient(130deg, rgb(33 86 183 / 61%) 20%, rgb(15 116 187 / 35%) 85%, transparent);width:0;z-index:1000}");
-        // 排序按钮
-        $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="null">默认</li><li data-value="buff-sort_asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort_desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort_asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort_desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
-        var sortBtnTimeout;
-        $(".buff-helper-sort").click(function () {
-            $(this).addClass("on");
-            clearTimeout(sortBtnTimeout);
-        }).mouseleave(function () {
-            let t = $(this);
-            if (t.hasClass("on")) {
-                sortBtnTimeout = setTimeout(() => t.removeClass("on"), 300);
-            }
-        });
-        $(".buff-helper-sort li").click(function (e) {
-            e.stopPropagation();
-            needSort = this.dataset.value;
-            if (this.dataset.value == "null") {
-                $("#helper-sort-text").text("比例排序");
-                sortGoods("data-default-sort", true);
-            } else {
-                $("#helper-sort-text").text(this.innerText);
-                let arr = this.dataset.value.split("_");
-                sortGoods("data-" + arr[0], arr[1] == "asc");
-            }
-            $(".buff-helper-sort").removeClass("on");
-        });
-        syncSort();
-        setTimeout(() => {
-            // 修改buff排序时重置比例排序规则
-            $("div[name='sort_by']").change(function () {
-                if (helper_config.overrideSortRule && this.getAttribute("value")) {
-                    needSort = this.dataset.value;
-                    $("#helper-sort-text").text("默认");
-                }
-            });
-        }, 500);
         $(document).ajaxSuccess(function (event, xhr, header, result) {
             if (/^\/api\/market\/goods/.exec(header.url) && result.data && result.data.total_count) {
                 buffHelperMarkerListScale(result.data.items);
@@ -215,6 +181,11 @@
                 }
             }
         });
+        if ($(".block-header>.l_Right").length == 0) {
+            setTimeout(initSortBtn, 100);
+        } else {
+            initSortBtn();
+        }
     }
 
     // 商品详情
@@ -746,6 +717,43 @@
         updateSteamStatus();
         syncCurrency();
         parseColor();
+    }
+
+    function initSortBtn() {
+        $(".block-header>.l_Right").append($('<div class="w-Select-Multi w-Select-scroll buff-helper-sort" style="visibility: visible; width: 140px;"><h3 id="helper-sort-text">比例排序</h3><i class="icon icon_drop"></i><ul style="width: 140px;"><li data-value="null">默认</li><li data-value="buff-sort_asc"><span class="w-Order_asc">buff比例从低到高<i class="icon icon_order"></i></span></li><li data-value="buff-sort_desc"><span class="w-Order_des">buff比例从高到低<i class="icon icon_order"></i></span></li><li data-value="order-sort_asc"><span class="w-Order_asc">求购比例从低到高<i class="icon icon_order"></i></span></li><li data-value="order-sort_desc"><span class="w-Order_des">求购比例从高到低<i class="icon icon_order"></i></span></li></ul></div>'));
+        var sortBtnTimeout;
+        $(".buff-helper-sort").click(function () {
+            $(this).addClass("on");
+            clearTimeout(sortBtnTimeout);
+        }).mouseleave(function () {
+            let t = $(this);
+            if (t.hasClass("on")) {
+                sortBtnTimeout = setTimeout(() => t.removeClass("on"), 300);
+            }
+        });
+        $(".buff-helper-sort li").click(function (e) {
+            e.stopPropagation();
+            needSort = this.dataset.value;
+            if (this.dataset.value == "null") {
+                $("#helper-sort-text").text("比例排序");
+                sortGoods("data-default-sort", true);
+            } else {
+                $("#helper-sort-text").text(this.innerText);
+                let arr = this.dataset.value.split("_");
+                sortGoods("data-" + arr[0], arr[1] == "asc");
+            }
+            $(".buff-helper-sort").removeClass("on");
+        });
+        syncSort();
+        setTimeout(() => {
+            // 修改buff排序时重置比例排序规则
+            $("div[name='sort_by']").change(function () {
+                if (helper_config.overrideSortRule && this.getAttribute("value")) {
+                    needSort = this.dataset.value;
+                    $("#helper-sort-text").text("默认");
+                }
+            });
+        }, 500);
     }
 
     function syncSort() {

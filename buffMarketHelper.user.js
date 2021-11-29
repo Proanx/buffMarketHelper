@@ -659,7 +659,7 @@
 
     function loadConfig() {
         let config = GM_getValue("helper_config");
-        if (config) {
+        if (config && Object.keys(config).length) {
             // 旧版更新到新版导致无数据
             config.pageSize = config.pageSize ? config.pageSize : 20;
             return config;

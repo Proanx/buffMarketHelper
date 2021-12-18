@@ -82,7 +82,8 @@
 
 ### 还有问题可以开[反馈贴][postFeedback]、加[QQ群][qqGroup2]或者发邮件[funkyturkey@yeah.net][emailMe]反馈
 > #### 1群：[~~`544144372`~~][qqGroup1] **已满**  
-> #### 2群：[`794103947`][qqGroup2]  
+> #### 2群：[~~`794103947`~~][qqGroup2] **已满**
+> #### 3群：[`609546167`][qqGroup3]  
 **需要私人订制插件、付费版/高级版的朋友可以直接省去加群的步骤**
 
 ---
@@ -106,6 +107,7 @@
 [githubCommits]:https://github.com/Proanx/buffMarketHelper/commits/master
 [qqGroup1]:https://jq.qq.com/?_wv=1027&k=U8mqorxQ
 [qqGroup2]:https://jq.qq.com/?_wv=1027&k=98pr2kNH
+[qqGroup3]:https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 <!-- Image -->
 [photo1]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D1.png
 [photo2]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D2.png

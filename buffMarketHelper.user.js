@@ -2,7 +2,7 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.32
+// @version         2.4.33
 // @note            更新于 2021年10月27日17:37:43
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
@@ -117,6 +117,10 @@
     var itemNum = 0;
     var needSort;
 
+    // 翻页类的操作没有重新加载的必要，用var可以直接当缓存用，不过只适用某个具体商品详情页
+    var steam_lowest_sell_order = 0;     // steam最低出售价
+    var steam_highest_buy_order = 0;     // steam最高求购价
+
     // toast CSS
     GM_addStyle(".jq-toast-wrap{display:block;position:fixed;width:250px;pointer-events:none!important;margin:0;padding:0;letter-spacing:normal;z-index:9000!important}.jq-toast-wrap *{margin:0;padding:0}.jq-toast-wrap.bottom-left{bottom:20px;left:20px}.jq-toast-wrap.bottom-right{bottom:20px;right:40px}.jq-toast-wrap.top-left{top:20px;left:20px}.jq-toast-wrap.top-right{top:20px;right:74px}.jq-toast-single{display:block;width:100%;padding:10px;margin:0 0 5px;border-radius:4px;font-size:15px;font-family:arial,sans-serif;line-height:18px;position:relative;pointer-events:all!important;background-color:#444;color:white;white-space:normal;word-break:break-all;overflow:hidden}.jq-toast-single hr{border:1px solid #fff;margin:4px 0}.jq-toast-single h2{font-family:arial,sans-serif;font-size:18px;font-weight:bold;margin:0 0 7px;background:0;color:inherit;line-height:inherit;letter-spacing:normal}.jq-toast-single a{color:#eee;text-decoration:none;font-weight:bold;border-bottom:1px solid white;margin-right:8px}.jq-toast-single ul{margin:0 0 0 15px;background:0;padding:0}.jq-toast-single ul li{list-style-type:disc!important;line-height:17px;background:0;margin:0;padding:0;letter-spacing:normal}.close-jq-toast-single{position:absolute;top:2px;right:5px;font-size:22px;cursor:pointer}.jq-toast-loader{display:block;position:absolute;bottom:0;height:4px;width:0;left:0;background:#000!important;opacity:.4}.jq-toast-loaded{width:100%}.jq-has-icon{padding:10px 10px 10px 43px;background-repeat:no-repeat;background-position:10px}.jq-icon-info{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=');background-color:#2878c1e6;color:#d9edf7;border-color:#bce8f1}.jq-icon-warning{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=');background-color:#F89406cc;color:#fcf8e3;border-color:#faebcc}.jq-icon-error{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=');background-color:#d4372fcc;color:#f2dede;border-color:#ebccd1}.jq-icon-success{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==');color:#dff0d8;background-color:#059850e6;border-color:#d6e9c6}.jq-icon-info:hover{background-color:#2878c1}.jq-icon-warning:hover{background-color:#e48b06}.jq-icon-error:hover{background-color:#c53d36}.jq-icon-success:hover{background-color:#059850}");
     // 设置界面
@@ -208,9 +212,6 @@
             let hash_name = encodeURIComponent(data.goods_infos[buff_item_id].market_hash_name);
             let items = data.items;
             let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny * 100;
-            // 翻页类的操作没有重新加载的必要，用var可以直接当缓存用
-            var steam_lowest_sell_order = 0;     // steam最低出售价
-            var steam_highest_buy_order = 0;     // steam最高求购价
             if (isFirstTime) {
                 getSteamSoldNumber(app_id, hash_name).then((soldNumber) => {
                     if (soldNumber.success) {
@@ -325,8 +326,6 @@
             let steam_price_cny = item.goods_info.steam_price_cny * 100;    // buff提供的steam国区售价
             let steam_market_url = item.steam_market_url;                   // steam市场链接
             let buff_sell_reference_price = item.sell_reference_price;      // buff出售参考价(没卵用)
-            let steam_highest_buy_order = 0;                                // steam最高求购价
-            let steam_lowest_sell_order = 0;                                // steam最低出售价
             $(good).attr("data-order-sort", Infinity);
             let orderList = await getSteamOrderList(buff_item_id, steam_market_url);
             if (orderList.success) {

@@ -2,7 +2,7 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.33
+// @version         2.4.34
 // @note            更新于 2021年10月27日17:37:43
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
@@ -32,35 +32,39 @@
 
     // 全局（插件环境）异常捕获
     window.onerror = function (e) {
-        // e.returnValue = false;       值为false时不会触发console.error事件
-        if (!e.error) { return; }     // 通常是浏览器内各种原因导致的报错
-        let scriptName = undefined;
-        // let errorType = undefined;   也许可以用来区分scriptManager，但是现在用不上
-        let renderingEngine = window.navigator.userAgent.match(/(Chrome|Firefox)\/([^ ]*)/);
-        let lineno = e.lineno;
-        switch (renderingEngine && renderingEngine[1]) {
-            case "Chrome":
-                // chrome+TamperMonkey在这个脚本内报错的情况下会需要两次decode
-                scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/([^\/=]*)\.user\.js/)[1]));
-                lineno -= 534;
-                // errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
-                break;
-            case "Firefox":
-                scriptName = decodeURIComponent(e.error.stack.match(/\/([^\/]*)\.user\.js/)[1]).trim();
-                lineno -= 1;
-                // errorType = e.message.match(/^([a-zA-Z]*): /)[1];
-                break;
-            default:
-                return;
-        }
-        if (scriptName == "网易BUFF价格比例(找挂刀)插件") {
-            let colno = e.colno;
-            let errorMsg = e.error.message;
-            let msgBody = `内核：${renderingEngine[0]}<br/>版本：${GM_info.script.version}<br/>区域：${helper_config.steamCurrency} ${steamConnection ? 200 : steamConnection == undefined ? "Unknow" : 404}<br/>位置：${lineno}:${colno}<br/>信息：${errorMsg}<br/>路径：${location.pathname}<br/>哈希：${location.hash}`;
-            let msgHtml = `恭喜！你可能发现了一个bug<hr/>${msgBody}<hr/>点击下面的链接可以直接进行反馈<br/><a href='mailto:funkyturkey@yeah.net?subject=【${GM_info.script.version}】${lineno}:${colno} ${errorMsg}&body=${encodeURIComponent(msgBody.replaceAll("<br/>", "\r\n"))}'>邮件反馈</a><a href="https://jq.qq.com/?_wv=1027&k=F0sj0vKs" target="_blank">QQ群反馈</a><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
-            showMessage("出现了意料之外的错误", msgHtml, "error", false);
-        } else {
-            console.log(`插件名称：${scriptName}\n代码位置：${e.lineno}:${e.colno}\n错误信息：${e.message}`);
+        try {
+            // e.returnValue = false;       值为false时不会触发console.error事件
+            if (!e.error) { return; }     // 通常是浏览器内各种原因导致的报错
+            let scriptName = undefined;
+            // let errorType = undefined;   也许可以用来区分scriptManager，但是现在用不上
+            let renderingEngine = window.navigator.userAgent.match(/(Chrome|Firefox)\/([^ ]*)/);
+            let lineno = e.lineno;
+            switch (renderingEngine && renderingEngine[1]) {
+                case "Chrome":
+                    // chrome+TamperMonkey在这个脚本内报错的情况下会需要两次decode
+                    scriptName = decodeURIComponent(decodeURIComponent(e.filename.match(/([^\/=]*)\.user\.js/)[1]));
+                    lineno -= 534;
+                    // errorType = e.message.match(/^Uncaught ([a-zA-Z]*): /)[1];
+                    break;
+                case "Firefox":
+                    scriptName = decodeURIComponent(e.error.stack.match(/\/([^\/]*)\.user\.js/)[1]).trim();
+                    lineno -= 1;
+                    // errorType = e.message.match(/^([a-zA-Z]*): /)[1];
+                    break;
+                default:
+                    return;
+            }
+            if (scriptName == "网易BUFF价格比例(找挂刀)插件") {
+                let colno = e.colno;
+                let errorMsg = e.error.message;
+                let msgBody = `内核：${renderingEngine[0]}<br/>版本：${GM_info.script.version}<br/>区域：${helper_config.steamCurrency} ${steamConnection ? 200 : steamConnection == undefined ? "Unknow" : 404}<br/>位置：${lineno}:${colno}<br/>信息：${errorMsg}<br/>路径：${location.pathname}<br/>哈希：${location.hash}`;
+                let msgHtml = `恭喜！你可能发现了一个bug<hr/>${msgBody}<hr/>点击下面的链接可以直接进行反馈<br/><a href='mailto:funkyturkey@yeah.net?subject=【${GM_info.script.version}】${lineno}:${colno} ${errorMsg}&body=${encodeURIComponent(msgBody.replaceAll("<br/>", "\r\n"))}'>邮件反馈</a><a href="https://jq.qq.com/?_wv=1027&k=F0sj0vKs" target="_blank">QQ群反馈</a><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion" target="_blank">反馈贴反馈</a>`;
+                showMessage("出现了意料之外的错误", msgHtml, "error", false);
+            } else {
+                console.log(`插件名称：${scriptName}\n代码位置：${e.lineno}:${e.colno}\n错误信息：${e.message}`);
+            }
+        } catch {
+            console.warn("unhandled 捕获了一个错误：", e);
         }
     }
 

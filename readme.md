@@ -1,6 +1,6 @@
+<h2 style="color:#0db700">插件是免费的，用来省钱的，想用来赚钱的<b style="background-color:#0db700;color:#0db700">韭菜</b>们可以继续开花</h2>
+<h1><i style="background-color:fuchsia;color:yellow">注：buff与steam均有反爬机制，请节制使用</i></h1>
 # [更新日志][githubCommits]|[插件介绍](#intro)|[常见问题与解决办法](#support)
-<h3 style="color:#228b22">插件是免费的，用来省钱的，想用来赚钱的韭菜们可以继续开花</h3>
-<mark><i>注：buff与steam均有反爬机制，请节制使用</i></mark>
 
 ---
 ## 感谢这些人的帮助与贡献

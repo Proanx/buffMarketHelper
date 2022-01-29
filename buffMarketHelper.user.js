@@ -242,11 +242,30 @@
                         // 求购表格
                         $(".market_commodity_orders_table th:first").after("<th>比例</th>");
                         let orderTableList = $(".market_commodity_orders_table tr");
+                        let viableScale = 0 // steam订购单比例低于1的数量
                         for (let i = 1; i < orderTableList.length; i++) {
                             let td = $(orderTableList[i]).find("td:first");
+                            let td_count = $(orderTableList[i]).find("td:last");
                             let priceGroup = convertPrice(td.text());
-                            td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + (priceGroup[3] || "00")))}</td>`);
+                            let scale = getScale(buff_sell_price, FtoC(priceGroup[1] + (priceGroup[3] || "00")))
+                            td.after(`<td>${scale}</td>`);
+
+                            // 检查steam订购单异常情况，若只有个别比例低于1，提醒用户，排除用于尾部统计的最后一行
+                            if(scale < 1 && i < orderTableList.length - 1){
+                                viableScale += parseInt(td_count.text())
+                            }
                         }
+                        // 当只有个别比例低于1时，添加提醒
+                        if(viableScale < 5){
+                            let warningSign = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--fe" width="16" height="16" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0 2C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm-1-6h2v2h-2v-2zm0-10h2v8h-2V6z" fill="currentColor" fill-rule="nonzero"></path></svg>'
+                            GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }')
+                            if(viableScale === 1 || viableScale === 2){
+                                $('#steam_order').append(`<div class="warning" style="color: red;">${warningSign}<div class="tips">仅有个别Steam订购单比例低于1，小心卖家自设虚假订购单</div></div>`)
+                            }else{
+                                $('#steam_order').append(`<div class="warning" style="color: orange;">${warningSign}<div class="tips">比例低于1的Steam订购单过少，请小心购买</div></div>`)
+                            }
+                        }
+
                         if (helper_config.orderFloatLeft) {
                             $(".market_commodity_orders_table").addClass("order_float_left");
                         }

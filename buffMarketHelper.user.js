@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.34
-// @note            更新于 2021年10月27日17:37:43
+// @version         2.4.35
+// @note            更新于 2022年1月31日22:06:46
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -18,7 +18,7 @@
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
 // @grant           GM_registerMenuCommand
-// @require         https://cdn.bootcdn.net/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js
+// @require         https://lib.baomitu.com/jquery-toast-plugin/1.3.2/jquery.toast.min.js
 // @connect         steamcommunity.com
 // ==/UserScript==
 
@@ -144,6 +144,8 @@
         GM_addStyle(".tooltip .tooltiptext{visibility:hidden;border: 1px solid #d0d0d0;width:128px;height:96px;background-color:#fbfbfbc7;position:absolute;z-index:60;bottom:100%;margin-left:-62px;border-radius:10px}.tooltip:hover .tooltiptext{visibility:visible}");
         // 求购列表css
         GM_addStyle(".market_commodity_orders_table.order_float_left{margin: 0 10px 0 0;float: left;}.market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
+        // 求购警告css
+        GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }')
 
         $(".detail-pic").css("background-repeat", "round").children().width(250);
         if ($("#j_game-switcher").data("current") == "dota2") {
@@ -256,14 +258,14 @@
                             }
                         }
                         // 当只有个别比例低于1时，添加提醒
-                        if(viableScale < 5){
-                            let warningSign = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--fe" width="16" height="16" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0 2C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm-1-6h2v2h-2v-2zm0-10h2v8h-2V6z" fill="currentColor" fill-rule="nonzero"></path></svg>'
-                            GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }')
-                            if(viableScale === 1 || viableScale === 2){
-                                $('#steam_order').append(`<div class="warning" style="color: red;">${warningSign}<div class="tips">仅有个别Steam订购单比例低于1，小心卖家自设虚假订购单</div></div>`)
-                            }else{
-                                $('#steam_order').append(`<div class="warning" style="color: orange;">${warningSign}<div class="tips">比例低于1的Steam订购单过少，请小心购买</div></div>`)
-                            }
+                        switch (true){
+                            case viableScale == 0: break;
+                            case viableScale < 3:
+                                $('#steam_order').append(`<div class="warning" style="color: red;"><i class="icon icon_warning_mid" style="filter: invert(1) hue-rotate(120deg)"></i><div class="tips">仅有个别Steam订购单比例低于1，小心卖家自设虚假订购单</div></div>`)
+                                break;
+                            case viableScale < 5:
+                                $('#steam_order').append(`<div class="warning" style="color: orange;"><i class="icon icon_warning_mid"></i><div class="tips">比例低于1的Steam订购单过少，请小心购买</div></div>`)
+                                break;
                         }
 
                         if (helper_config.orderFloatLeft) {

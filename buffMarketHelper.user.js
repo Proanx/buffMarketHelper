@@ -18,7 +18,7 @@
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
 // @grant           GM_registerMenuCommand
-// @require         https://cdn.bootcdn.net/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js
+// @require         https://lib.baomitu.com/jquery-toast-plugin/1.3.2/jquery.toast.min.js
 // @connect         steamcommunity.com
 // ==/UserScript==
 
@@ -145,6 +145,8 @@
         GM_addStyle(".tooltip .tooltiptext{visibility:hidden;border: 1px solid #d0d0d0;width:128px;height:96px;background-color:#fbfbfbc7;position:absolute;z-index:60;bottom:100%;margin-left:-62px;border-radius:10px}.tooltip:hover .tooltiptext{visibility:visible}");
         // 求购列表css
         GM_addStyle(".market_commodity_orders_table.order_float_left{margin: 0 10px 0 0;float: left;}.market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
+        // 求购警告css
+        GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }')
 
         $(".detail-pic").css("background-repeat", "round").children().width(250);
         if ($("#j_game-switcher").data("current") == "dota2") {
@@ -243,11 +245,30 @@
                         // 求购表格
                         $(".market_commodity_orders_table th:first").after("<th>比例</th>");
                         let orderTableList = $(".market_commodity_orders_table tr");
+                        let viableScale = 0 // steam订购单比例低于1的数量
                         for (let i = 1; i < orderTableList.length; i++) {
                             let td = $(orderTableList[i]).find("td:first");
+                            let td_count = $(orderTableList[i]).find("td:last");
                             let priceGroup = convertPrice(td.text());
-                            td.after(`<td>${getScale(buff_sell_price, FtoC(priceGroup[1] + (priceGroup[3] || "00")))}</td>`);
+                            let scale = getScale(buff_sell_price, FtoC(priceGroup[1] + (priceGroup[3] || "00")))
+                            td.after(`<td>${scale}</td>`);
+
+                            // 检查steam订购单异常情况，若只有个别比例低于1，提醒用户，排除用于尾部统计的最后一行
+                            if(scale < 1 && i < orderTableList.length - 1){
+                                viableScale += parseInt(td_count.text())
+                            }
                         }
+                        // 当只有个别比例低于1时，添加提醒
+                        switch (true){
+                            case viableScale == 0: break;
+                            case viableScale < 3:
+                                $('#steam_order').append(`<div class="warning" style="color: red;"><i class="icon icon_warning_mid" style="filter: invert(1) hue-rotate(120deg)"></i><div class="tips">仅有个别Steam订购单比例低于1，小心卖家自设虚假订购单</div></div>`)
+                                break;
+                            case viableScale < 5:
+                                $('#steam_order').append(`<div class="warning" style="color: orange;"><i class="icon icon_warning_mid"></i><div class="tips">比例低于1的Steam订购单过少，请小心购买</div></div>`)
+                                break;
+                        }
+
                         if (helper_config.orderFloatLeft) {
                             $(".market_commodity_orders_table").addClass("order_float_left");
                         }

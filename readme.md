@@ -1,5 +1,5 @@
-<h2 style="color:#0db700">插件是免费的，用来省钱的，想用来赚钱的<b style="background-color:#0db700;color:#0db700">韭菜</b>们可以继续开花</h2>
-<h1><i style="background-color:fuchsia;color:yellow">注：buff与steam均有反爬机制，请节制使用</i></h1>
+<h1 style="background-color:#f00;color:#11ff00">插件是免费的，用来省钱的，想用来赚钱的<b style="color:#e9ff1f">韭菜</b>们可以继续开花</h1>
+<h2><i style="color:#9a00ff">注：buff与steam均有反爬机制，请节制使用</i></h2>
 # [更新日志][githubCommits]|[插件介绍](#intro)|[常见问题与解决办法](#support)
 
 ---
@@ -84,7 +84,7 @@
 > #### 1群：[~~`544144372`~~][qqGroup1] **已满**  
 > #### 2群：[~~`794103947`~~][qqGroup2] **已满**
 > #### 3群：[`609546167`][qqGroup3]  
-**需要私人订制插件、付费版/高级版的朋友可以直接省去加群的步骤**
+**需要私人订制插件、付费版/高级版的朋友赶紧给我爬😅😅😅**
 
 ---
 

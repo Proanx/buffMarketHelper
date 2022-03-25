@@ -92,7 +92,7 @@
 ### 不管你是普通人还是开发者，只要建议被采纳都会加进顶部的感谢名单！  ヽ(￣ω￣(￣ω￣〃)ゝ) 快来一起开发插件吧
 
 ### 如果你喜欢这个插件或者喜欢我本人，可以扫这里打赏↓  
-<img src="https://gitee.com/pronax/drawing-bed/raw/master/donate.png"  height="300" width="300">  
+<img src="https://buffmarkethelper.oss-cn-shenzhen.aliyuncs.com/tipcode_large.png"  height="300" width="300">  
 
 <!-- Contributors -->
 [contributors-bitaminkim]:https://keylol.com/forum.php?mod=viewthread&tid=731319
@@ -109,15 +109,16 @@
 [qqGroup2]:https://jq.qq.com/?_wv=1027&k=98pr2kNH
 [qqGroup3]:https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 <!-- Image -->
-[photo1]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D1.png
-[photo2]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D2.png
-[photo3]:https://gitee.com/pronax/buffMarketHelper/raw/master/%E4%BB%8B%E7%BB%8D3.png
-[iconograph1-1]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-1.png
-[iconograph1-2]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-2.png
-[iconograph1-3]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/1-3.png
-[iconograph2-1]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-1.png
-[iconograph2-2]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-2.png
-[iconograph2-3]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-3.gif
-[iconograph2-4]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-4.gif
-[iconograph2-5]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-5.png
-[iconograph2-6]:https://gitee.com/pronax/buffMarketHelper/raw/master/iconograph/2-6.png
+[photo1]:https://s1.ax1x.com/2022/03/25/qt3Kun.png
+[photo2]:https://s1.ax1x.com/2022/03/25/qt3QH0.png
+[photo3]:https://s1.ax1x.com/2022/03/25/qt3njs.png
+[iconograph1-1]:https://s1.ax1x.com/2022/03/25/qt3cgH.png
+[iconograph1-2]:https://s1.ax1x.com/2022/03/25/qt368e.png
+[iconograph1-3]:https://s1.ax1x.com/2022/03/25/qt3yCD.png
+[iconograph2-1]:https://s1.ax1x.com/2022/03/25/qt3gvd.png
+[iconograph2-2]:https://s1.ax1x.com/2022/03/25/qt3r4O.png
+[iconograph2-3]:https://s1.ax1x.com/2022/03/25/qt3RKA.gif
+[iconograph2-4]:https://s1.ax1x.com/2022/03/25/qt3fbt.gif
+[iconograph2-5]:https://s1.ax1x.com/2022/03/25/qt3WDI.png
+[iconograph2-6]:https://s1.ax1x.com/2022/03/25/qt34VP.png
+[tipcode]:https://buffmarkethelper.oss-cn-shenzhen.aliyuncs.com/tipcode_large.png

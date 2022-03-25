@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name            网易BUFF价格比例(找挂刀)插件
-// @icon            https://gitee.com/pronax/drawing-bed/raw/master/wingman/Wingman.png
+// @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
 // @version         2.4.35
 // @note            更新于 2022年3月17日23:53:18
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
-// @contributionURL https://afdian.net/@pronax
 // @license         AGPL-3.0
 // @copyright       2021, Pronax
 // @include         /https:\/\/buff\.163\.com\/(market|goods)\/(csgo|dota2|rust|h1z1|tf2|pubg|pubg_recycle|\d+)/

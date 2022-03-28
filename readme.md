@@ -55,7 +55,7 @@
 4. **插件没有运行**
    1. 不要在首页测试了
    2. 也不要在热门关注里测试
-   3. 火狐不要使用Greasemonkey，改用Tampermonkey和Violentmonkey都可以
+   3. 不要使用Greasemonkey，改用Tampermonkey和Violentmonkey都可以
 5. **提示我请求次数过多**
    1. 拿<b style="color:red">使用插件的浏览器</b>登录网页版steam（账号须可交易）  
    2. 加速器换个节点（IP）

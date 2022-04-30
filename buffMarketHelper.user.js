@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.35
-// @note            更新于 2022年3月17日23:53:18
+// @version         2.4.36
+// @note            更新于 2022年4月30日12:16:07
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -145,19 +145,25 @@
         // 求购列表css
         GM_addStyle(".market_commodity_orders_table.order_float_left{margin: 0 10px 0 0;float: left;}.market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
         // 求购警告css
-        GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }')
+        GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }');
 
-        $(".detail-pic").css("background-repeat", "round").children().width(250);
-        if ($("#j_game-switcher").data("current") == "dota2") {
-            $(".detail-cont>p").append($(".detail-summ>a").clone().addClass("steam-link"));
-        } else {
-            $(".detail-cont>div:first").append($(".detail-summ>a").clone().addClass("steam-link"));
-        }
+        (function initSteamLink() {
+            if (!document.querySelector(".detail-cont")) {
+                requestIdleCallback(initSteamLink, { timeout: 300 });
+                return;
+            }
+            $(".detail-pic").css("background-repeat", "round").children().width(250);
+            if ($("#j_game-switcher").data("current") == "dota2") {
+                $(".detail-cont>p").append($(".detail-summ>a").clone().addClass("steam-link"));
+            } else {
+                $(".detail-cont>div:first").append($(".detail-summ>a").clone().addClass("steam-link"));
+            }
 
-        // 适配 ”饰品比例计算脚本“ greasyfork.org/scripts/35597
-        // 防止排版冲突混乱
-        $(".detail-summ>a").hide();
-        $(".detail-cont").css("margin-left", 0);
+            // 适配 ”饰品比例计算脚本“ greasyfork.org/scripts/35597
+            // 防止排版冲突混乱
+            $(".detail-summ>a").hide();
+            $(".detail-cont").css("margin-left", 0);
+        })();
 
         $(document).ajaxSuccess(function (event, status, header, result) {
             if (/^\/api\/market\/goods\/sell_order/.exec(header.url) && result.data && result.data.goods_infos[getGoodsId()] && result.data.total_count) {

@@ -259,12 +259,12 @@
                             td.after(`<td>${scale}</td>`);
 
                             // 检查steam订购单异常情况，若只有个别比例低于1，提醒用户，排除用于尾部统计的最后一行
-                            if(scale < 1 && i < orderTableList.length - 1){
+                            if (scale < 1 && i < orderTableList.length - 1) {
                                 viableScale += parseInt(td_count.text())
                             }
                         }
                         // 当只有个别比例低于1时，添加提醒
-                        switch (true){
+                        switch (true) {
                             case viableScale == 0: break;
                             case viableScale < 3:
                                 $('#steam_order').append(`<div class="warning" style="color: red;"><i class="icon icon_warning_mid" style="filter: invert(1) hue-rotate(120deg)"></i><div class="tips">仅有个别Steam订购单比例低于1，小心卖家自设虚假订购单</div></div>`)

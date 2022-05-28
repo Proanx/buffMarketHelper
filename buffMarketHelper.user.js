@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.37
-// @note            更新于 2022年5月10日21:38:14
+// @version         2.4.38
+// @note            更新于 2022年5月28日17:44:39
 // @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -70,7 +70,10 @@
     const STEAM_ORDER_SCALE_TEMPLATE = "<span class=\"f_12px f_Bold l_Right steam_temp steam_order_scale\"></span>";
     const STEAM_SOLD_NUMBER_TEMPLATE = "<span class=\"f_12px c_Green f_Bold l_Right steam_temp steam_sold_number\"></span>";
     const STEAM_ORDER_NUMBER_TEMPLATE = "<span class=\"f_12px c_Gray f_Bold l_Right steam_temp steam_order_number\"></span>";
-    const STEAM_ORDER_NUMBER_ERROR_TEMPLATE = "<span class=\"f_12px c_Gray f_Bold l_Right steam_temp steam_order_number_error\" style=\"color:#e45302 !important\"></span>";
+    const ERROR_TEMPLATE = "<span class=\"f_12px c_Error f_Bold l_Right steam_temp steam_order_number_error\"></span>";
+    const WARNING_TEMPLATE = "<span class=\"f_12px c_Orange f_Bold l_Right steam_temp steam_order_number_error\"></span>";
+    const INFO_TEMPLATE = "<span class=\"f_12px c_Blue f_Bold l_Right steam_temp steam_order_number_error\"></span>";
+    const HIGHLIGHT_TEMPLATE = "<span class=\"f_12px c_Highlight f_Bold l_Right steam_temp steam_order_number_error\"></span>";
     const ENHANCEMENT_SUPPORT_LIST = Array("rifle", "knife", "pistol", "smg", "machinegun", "shotgun", "hands");
     const DEFAULT_CONFIG = {
         maxRange: 1,
@@ -85,7 +88,8 @@
         marketColorHigh: "#5027ff",
         steamCurrency: "CNY",
         currencyEffectCalculate: false,
-        displaySoldNumber: false
+        displaySoldNumber: false,
+        buffSellThreshold: 0,
     };
 
     const g_rgCurrencyData = { "AED": { "strCode": "AED", "eCurrencyCode": 32, "strSymbol": "AED", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "ARS": { "strCode": "ARS", "eCurrencyCode": 34, "strSymbol": "ARS$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "AUD": { "strCode": "AUD", "eCurrencyCode": 21, "strSymbol": "A$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "BRL": { "strCode": "BRL", "eCurrencyCode": 7, "strSymbol": "R$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "CAD": { "strCode": "CAD", "eCurrencyCode": 20, "strSymbol": "CDN$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "CHF": { "strCode": "CHF", "eCurrencyCode": 4, "strSymbol": "CHF", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " }, "CLP": { "strCode": "CLP", "eCurrencyCode": 25, "strSymbol": "CLP$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "CNY": { "strCode": "CNY", "eCurrencyCode": 23, "strSymbol": "¥", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "COP": { "strCode": "COP", "eCurrencyCode": 27, "strSymbol": "COL$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "CRC": { "strCode": "CRC", "eCurrencyCode": 40, "strSymbol": "₡", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "CZK": { "strCode": "CZK", "eCurrencyCode": 44, "strSymbol": "Kč", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "DKK": { "strCode": "DKK", "eCurrencyCode": 45, "strSymbol": "kr.", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "EUR": { "strCode": "EUR", "eCurrencyCode": 3, "strSymbol": "€", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "GBP": { "strCode": "GBP", "eCurrencyCode": 2, "strSymbol": "£", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "HKD": { "strCode": "HKD", "eCurrencyCode": 29, "strSymbol": "HK$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "HRK": { "strCode": "HRK", "eCurrencyCode": 43, "strSymbol": "kn", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "HUF": { "strCode": "HUF", "eCurrencyCode": 46, "strSymbol": "Ft", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "IDR": { "strCode": "IDR", "eCurrencyCode": 10, "strSymbol": "Rp", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " }, "ILS": { "strCode": "ILS", "eCurrencyCode": 35, "strSymbol": "₪", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "INR": { "strCode": "INR", "eCurrencyCode": 24, "strSymbol": "₹", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "JPY": { "strCode": "JPY", "eCurrencyCode": 8, "strSymbol": "¥", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "KRW": { "strCode": "KRW", "eCurrencyCode": 16, "strSymbol": "₩", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "KWD": { "strCode": "KWD", "eCurrencyCode": 38, "strSymbol": "KD", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "KZT": { "strCode": "KZT", "eCurrencyCode": 37, "strSymbol": "₸", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "MXN": { "strCode": "MXN", "eCurrencyCode": 19, "strSymbol": "Mex$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "MYR": { "strCode": "MYR", "eCurrencyCode": 11, "strSymbol": "RM", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "NOK": { "strCode": "NOK", "eCurrencyCode": 9, "strSymbol": "kr", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "NZD": { "strCode": "NZD", "eCurrencyCode": 22, "strSymbol": "NZ$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "PEN": { "strCode": "PEN", "eCurrencyCode": 26, "strSymbol": "S/.", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "PHP": { "strCode": "PHP", "eCurrencyCode": 12, "strSymbol": "P", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "PLN": { "strCode": "PLN", "eCurrencyCode": 6, "strSymbol": "zł", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "QAR": { "strCode": "QAR", "eCurrencyCode": 39, "strSymbol": "QR", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "RMB": { "strCode": "RMB", "eCurrencyCode": 23, "strSymbol": "¥", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "RON": { "strCode": "RON", "eCurrencyCode": 47, "strSymbol": "lei", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "RUB": { "strCode": "RUB", "eCurrencyCode": 5, "strSymbol": "pуб.", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": "", "strSymbolAndNumberSeparator": " " }, "SAR": { "strCode": "SAR", "eCurrencyCode": 31, "strSymbol": "SR", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "SEK": { "strCode": "SEK", "eCurrencyCode": 33, "strSymbol": "kr", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "SGD": { "strCode": "SGD", "eCurrencyCode": 13, "strSymbol": "S$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "THB": { "strCode": "THB", "eCurrencyCode": 14, "strSymbol": "฿", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "TRY": { "strCode": "TRY", "eCurrencyCode": 17, "strSymbol": "TL", "bSymbolIsPrefix": false, "bWholeUnitsOnly": false, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": " " }, "TWD": { "strCode": "TWD", "eCurrencyCode": 30, "strSymbol": "NT$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": " " }, "UAH": { "strCode": "UAH", "eCurrencyCode": 18, "strSymbol": "₴", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": "" }, "USD": { "strCode": "USD", "eCurrencyCode": 1, "strSymbol": "$", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": ",", "strSymbolAndNumberSeparator": "" }, "UYU": { "strCode": "UYU", "eCurrencyCode": 41, "strSymbol": "$U", "bSymbolIsPrefix": true, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "VND": { "strCode": "VND", "eCurrencyCode": 15, "strSymbol": "₫", "bSymbolIsPrefix": false, "bWholeUnitsOnly": true, "strDecimalSymbol": ",", "strThousandsSeparator": ".", "strSymbolAndNumberSeparator": "" }, "ZAR": { "strCode": "ZAR", "eCurrencyCode": 28, "strSymbol": "R", "bSymbolIsPrefix": true, "bWholeUnitsOnly": false, "strDecimalSymbol": ".", "strThousandsSeparator": " ", "strSymbolAndNumberSeparator": " " } }
@@ -129,7 +133,7 @@
     GM_addStyle(".jq-toast-wrap{display:block;position:fixed;width:250px;pointer-events:none!important;margin:0;padding:0;letter-spacing:normal;z-index:9000!important}.jq-toast-wrap *{margin:0;padding:0}.jq-toast-wrap.bottom-left{bottom:20px;left:20px}.jq-toast-wrap.bottom-right{bottom:20px;right:40px}.jq-toast-wrap.top-left{top:20px;left:20px}.jq-toast-wrap.top-right{top:20px;right:74px}.jq-toast-single{display:block;width:100%;padding:10px;margin:0 0 5px;border-radius:4px;font-size:15px;font-family:arial,sans-serif;line-height:18px;position:relative;pointer-events:all!important;background-color:#444;color:white;white-space:normal;word-break:break-all;overflow:hidden}.jq-toast-single hr{border:1px solid #fff;margin:4px 0}.jq-toast-single h2{font-family:arial,sans-serif;font-size:18px;font-weight:bold;margin:0 0 7px;background:0;color:inherit;line-height:inherit;letter-spacing:normal}.jq-toast-single a{color:#eee;text-decoration:none;font-weight:bold;border-bottom:1px solid white;margin-right:8px}.jq-toast-single ul{margin:0 0 0 15px;background:0;padding:0}.jq-toast-single ul li{list-style-type:disc!important;line-height:17px;background:0;margin:0;padding:0;letter-spacing:normal}.close-jq-toast-single{position:absolute;top:2px;right:5px;font-size:22px;cursor:pointer}.jq-toast-loader{display:block;position:absolute;bottom:0;height:4px;width:0;left:0;background:#000!important;opacity:.4}.jq-toast-loaded{width:100%}.jq-has-icon{padding:10px 10px 10px 43px;background-repeat:no-repeat;background-position:10px}.jq-icon-info{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVEhLtZa9SgNBEMc9sUxxRcoUKSzSWIhXpFMhhYWFhaBg4yPYiWCXZxBLERsLRS3EQkEfwCKdjWJAwSKCgoKCcudv4O5YLrt7EzgXhiU3/4+b2ckmwVjJSpKkQ6wAi4gwhT+z3wRBcEz0yjSseUTrcRyfsHsXmD0AmbHOC9Ii8VImnuXBPglHpQ5wwSVM7sNnTG7Za4JwDdCjxyAiH3nyA2mtaTJufiDZ5dCaqlItILh1NHatfN5skvjx9Z38m69CgzuXmZgVrPIGE763Jx9qKsRozWYw6xOHdER+nn2KkO+Bb+UV5CBN6WC6QtBgbRVozrahAbmm6HtUsgtPC19tFdxXZYBOfkbmFJ1VaHA1VAHjd0pp70oTZzvR+EVrx2Ygfdsq6eu55BHYR8hlcki+n+kERUFG8BrA0BwjeAv2M8WLQBtcy+SD6fNsmnB3AlBLrgTtVW1c2QN4bVWLATaIS60J2Du5y1TiJgjSBvFVZgTmwCU+dAZFoPxGEEs8nyHC9Bwe2GvEJv2WXZb0vjdyFT4Cxk3e/kIqlOGoVLwwPevpYHT+00T+hWwXDf4AJAOUqWcDhbwAAAAASUVORK5CYII=');background-color:#2878c1e6;color:#d9edf7;border-color:#bce8f1}.jq-icon-warning{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=');background-color:#F89406cc;color:#fcf8e3;border-color:#faebcc}.jq-icon-error{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHOSURBVEhLrZa/SgNBEMZzh0WKCClSCKaIYOED+AAKeQQLG8HWztLCImBrYadgIdY+gIKNYkBFSwu7CAoqCgkkoGBI/E28PdbLZmeDLgzZzcx83/zZ2SSXC1j9fr+I1Hq93g2yxH4iwM1vkoBWAdxCmpzTxfkN2RcyZNaHFIkSo10+8kgxkXIURV5HGxTmFuc75B2RfQkpxHG8aAgaAFa0tAHqYFfQ7Iwe2yhODk8+J4C7yAoRTWI3w/4klGRgR4lO7Rpn9+gvMyWp+uxFh8+H+ARlgN1nJuJuQAYvNkEnwGFck18Er4q3egEc/oO+mhLdKgRyhdNFiacC0rlOCbhNVz4H9FnAYgDBvU3QIioZlJFLJtsoHYRDfiZoUyIxqCtRpVlANq0EU4dApjrtgezPFad5S19Wgjkc0hNVnuF4HjVA6C7QrSIbylB+oZe3aHgBsqlNqKYH48jXyJKMuAbiyVJ8KzaB3eRc0pg9VwQ4niFryI68qiOi3AbjwdsfnAtk0bCjTLJKr6mrD9g8iq/S/B81hguOMlQTnVyG40wAcjnmgsCNESDrjme7wfftP4P7SP4N3CJZdvzoNyGq2c/HWOXJGsvVg+RA/k2MC/wN6I2YA2Pt8GkAAAAASUVORK5CYII=');background-color:#d4372fcc;color:#f2dede;border-color:#ebccd1}.jq-icon-success{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADsSURBVEhLY2AYBfQMgf///3P8+/evAIgvA/FsIF+BavYDDWMBGroaSMMBiE8VC7AZDrIFaMFnii3AZTjUgsUUWUDA8OdAH6iQbQEhw4HyGsPEcKBXBIC4ARhex4G4BsjmweU1soIFaGg/WtoFZRIZdEvIMhxkCCjXIVsATV6gFGACs4Rsw0EGgIIH3QJYJgHSARQZDrWAB+jawzgs+Q2UO49D7jnRSRGoEFRILcdmEMWGI0cm0JJ2QpYA1RDvcmzJEWhABhD/pqrL0S0CWuABKgnRki9lLseS7g2AlqwHWQSKH4oKLrILpRGhEQCw2LiRUIa4lwAAAABJRU5ErkJggg==');color:#dff0d8;background-color:#059850e6;border-color:#d6e9c6}.jq-icon-info:hover{background-color:#2878c1}.jq-icon-warning:hover{background-color:#e48b06}.jq-icon-error:hover{background-color:#c53d36}.jq-icon-success:hover{background-color:#059850}");
     // 设置界面
     GM_addStyle(".helper_importantA{font-size:22px;font-weight:bold;color:#ffa914 !important}.helper_importantA:hover{color:#ff2c2c !important}.helper-setting input[type=number]{max-width:70px}input[type=\"number\"]{-moz-appearance:textfield}.helper-setting-shadow{position:fixed;justify-content:center;align-items:center;display:none;z-index:100;top:0;right:0;bottom:0;left:0;margin:0;background:#00000066}.helper-setting{background:#fff;border-radius:5px;padding:30px 40px 10px;top:25%;opacity:0.95;}.w-Checkbox.helper-setting-option>span:first-child{margin:0!important;font-size:14px}.helper-setting-steamConnection i.icon{margin-left:0!important}.helper-setting .list_tb span,.helper-setting .list_tb i.icon{margin-left:12px}.helper-setting .icon_status_progressing{animation:rotate-L 1.5s linear infinite;-webkit-animation:rotate-L 1.5s linear infinite}.helper-setting>.list_tb tr:last-child>td{border-bottom:0}.helper-setting td.setting-title{height:0;border:0;padding:5px 0 0 0}");
-    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><span class="c_DGrey steamConnectionCountdown" style="display: none;"></span><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray">Steam参考货币</td><td class="t_Left" colspan="2"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span><i class="icon icon_qa j_tips_handler helper-warning-currency" data-title="说明：" data-content="选择获取steam数据时使用什么货币，会影响税后价格、求购价格等\n默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyEffectCalculate" class="w-Checkbox helper-setting-option" data-option-target="currencyEffectCalculate" value=""><span value="true"><i class="icon icon_checkbox"></i>无视汇率</span></div></span><i class="icon icon_qa j_tips_handler helper-warning-currency" data-title="说明：" data-content="勾选后不会将外币转回人民币进行计算（无特殊需求不用开）" data-direction="right"></i></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>市场页设定</b></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序时插件不进行排序（可以手动排，不影响设置）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序</td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="等待所有饰品比例都加载完成后再进行排序" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="只能排序当前加载的页面，全局排序请自行寻找其他插件" data-direction="right"></i></td></tr><tr><td class="t_Left c_Gray">每页显示数量</td><td class="t_Left"><span><input type="number" id="helper-setting-pageSize" data-option-target="pageSize" class="i_Text helper-setting-option" min="1" max="80" step="1"></span><i class="icon icon_qa j_tips_handler helper-warning-pageNum" data-title="修改每页显示数量" data-content="可能增加封号概率，小白勿用，默认值20，最大值80" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色</td><td class="t_Left" colspan="2"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色\n渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值</td><td class="t_Left" colspan="2"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色\n比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>商品页设定</b></td></tr><tr><td class="t_Left c_Gray">求购列表靠左显示</td><td class="t_Left"><span><div id="helper-setting-orderFloatLeft" class="w-Checkbox helper-setting-option" data-option-target="orderFloatLeft"><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="决定求购列表是否显示在左侧（饰品图片之后）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">反向贴纸顺序</td><td class="t_Left"><span><div id="helper-setting-reverseSticker" class="w-Checkbox helper-setting-option" data-option-target="reverseSticker"><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="将饰品贴纸的顺序倒转，保持和检视时枪上的顺序一样" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137" class="helper_importantA">插件免费 请勿上当 官网安装 防止盗号</a><br /></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137">插件官网</a><span><a href="https://greasyfork.org/zh-CN/scripts/410137#support">常见问题</a></span><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span><span><a href="https://greasyfork.org/zh-CN/scripts/410137#additional-info">使用教程</a></span><span><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion">问题反馈</a></span></td></tr></tbody></table></div></div>');
+    $("body").append('<div class="cont_main helper-setting-shadow"><div class="helper-setting"><b>基础设定</b><span id="helper-version" style="float: right;">插件版本：</span><table class="list_tb"><tbody><tr><td class="t_Left c_Gray">STEAM连接性：</td><td class="t_Left helper-setting-steamConnection"><span class="c_Yellow"><i class="icon icon_status_waiting"></i>未知</span></td><td class="t_Right"><span class="c_DGrey steamConnectionCountdown" style="display: none;"></span><a href="javascript:void(0);" id="helper-setting-checkBtn" class="i_Btn i_Btn_small">检测</a></td></tr><tr><td class="t_Left c_Gray">Steam参考货币</td><td class="t_Left" colspan="2"><span><div id="helper-setting-currency" class="w-Select helper-setting-option" data-option-target="steamCurrency" style="width: 120px; visibility: visible;"><h3 style="margin:0;font-weight:normal;">默认</h3><i class="icon icon_drop"></i><ul style="width: 120px;height: 200px;overflow: auto;" class="steam-currency-selector"></ul></div></span><i class="icon icon_qa j_tips_handler helper-warning-currency" data-title="说明：" data-content="选择获取steam数据时使用什么货币，会影响税后价格、求购价格等\n默认为CNY（￥）" data-direction="right"></i><span><div id="helper-setting-currencyEffectCalculate" class="w-Checkbox helper-setting-option" data-option-target="currencyEffectCalculate" value=""><span value="true"><i class="icon icon_checkbox"></i>无视汇率</span></div></span><i class="icon icon_qa j_tips_handler helper-warning-currency" data-title="说明：" data-content="勾选后不会将外币转回人民币进行计算（无特殊需求不用开）" data-direction="right"></i></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>市场页设定</b></td></tr><tr><td class="t_Left c_Gray">在售数量门槛</td><td class="t_Left"><span><input type="number" id="helper-setting-buffSellThreshold" data-option-target="buffSellThreshold" class="i_Text helper-setting-option" min="0" step="1"></span><i class="icon icon_qa j_tips_handler helper-warning-sell-threshold" data-title="说明：" data-content="在售量小于设定值的商品会被略过，可以减少对steam的请求" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">覆盖排序规则</td><td class="t_Left"><span><div id="helper-setting-stickerSort" class="w-Checkbox helper-setting-option" data-option-target="overrideSortRule" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="开启后使用buff排序时插件不进行排序（可以手动排，不影响设置）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray" width="120">完成后排序</td><td class="t_Left"><span><div id="helper-setting-sortAfterAllDone" class="w-Checkbox helper-setting-option" data-option-target="sortAfterAllDone" value=""><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="等待所有饰品比例都加载完成后再进行排序" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">默认排序规则</td><td class="t_Left"><span><div id="helper-setting-sortRule" class="w-Select helper-setting-option" data-option-target="needSort" style="visibility: visible;"><h3 style="margin:0;font-weight:normal;">不排序</h3><i class="icon icon_drop"></i><ul style="width: 130px;"><li value="null">不排序</li><li value="buff-sort_asc">按buff比例从低到高</li><li value="buff-sort_desc">按buff比例从高到低</li><li value="order-sort_asc">按求购比例从低到高</li><li value="order-sort_desc">按求购比例从高到低</li></ul></div></span></td><td class="t_Right"><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="只能排序当前加载的页面，全局排序请自行寻找其他插件" data-direction="right"></i></td></tr><tr><td class="t_Left c_Gray">每页显示数量</td><td class="t_Left"><span><input type="number" id="helper-setting-pageSize" data-option-target="pageSize" class="i_Text helper-setting-option" min="1" max="80" step="1"></span><i class="icon icon_qa j_tips_handler helper-warning-pageNum" data-title="修改每页显示数量" data-content="可能增加封号概率，小白勿用，默认值20，最大值80" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">渐变色</td><td class="t_Left" colspan="2"><span class="c_DGray">最小 <input type="color" id="helper-setting-marketColorLow" data-option-target="marketColorLow" class="helper-setting-option"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="渐变最小值：比例越接近最小值（默认是0.63）会越趋近这个颜色\n渐变最大值：比例越接近最大值（默认是1）会越趋近这个颜色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="color" id="helper-setting-marketColorHigh" data-option-target="marketColorHigh" class="helper-setting-option"></span></td></tr><tr><td class="t_Left c_Gray">比例极值</td><td class="t_Left" colspan="2"><span class="c_DGray">最小 <input type="number" id="helper-setting-minRange" data-option-target="minRange" class="i_Text helper-setting-option" min="0" max="1" step="0.01"></span><i class="icon icon_qa j_tips_handler" data-title="" data-content="比例最小值：小于等于这个值的比例会直接渲染成最小值渐变色\n比例最大值：大于等于这个值的比例会直接渲染成最大值渐变色" data-direction="bottom"></i><span class="c_DGray">最大 <input type="number" id="helper-setting-maxRange" data-option-target="maxRange" class="i_Text helper-setting-option" min="1" max="100"></span></td></tr></tbody><tbody><tr><td class="t_Left setting-title" colspan="3"><b>商品页设定</b></td></tr><tr><td class="t_Left c_Gray">求购列表靠左显示</td><td class="t_Left"><span><div id="helper-setting-orderFloatLeft" class="w-Checkbox helper-setting-option" data-option-target="orderFloatLeft"><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="决定求购列表是否显示在左侧（饰品图片之后）" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Left c_Gray">反向贴纸顺序</td><td class="t_Left"><span><div id="helper-setting-reverseSticker" class="w-Checkbox helper-setting-option" data-option-target="reverseSticker"><span value="true"><i class="icon icon_checkbox"></i>启用 </span></div></span><i class="icon icon_qa j_tips_handler" data-title="说明：" data-content="将饰品贴纸的顺序倒转，保持和检视时枪上的顺序一样" data-direction="right"></i></td><td class="t_Right"></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137" class="helper_importantA">插件免费 请勿上当 官网安装 防止盗号</a><br /></td></tr><tr><td class="t_Center" colspan="3"><a href="https://greasyfork.org/zh-CN/scripts/410137">插件官网</a><span><a href="https://greasyfork.org/zh-CN/scripts/410137#support">常见问题</a></span><span><a href="javascript:void(0);" id="helper-setting-resetAll" class="i_Btn i_Btn_small">恢复默认设置</a></span><span><a href="https://greasyfork.org/zh-CN/scripts/410137#additional-info">使用教程</a></span><span><a href="https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion">问题反馈</a></span></td></tr></tbody></table></div></div>');
     // 初始化货币
     initCurrency();
     // 添加翻页和设置按钮，初始化部分数据
@@ -361,92 +365,97 @@
             let steam_lowest_sell_order = undefined;                        // 不能使用全局变量，不然未成功加载的数据比例会错误
             $(good).attr("data-order-sort", Infinity);
             $(good).attr("data-sold_number-sort", Infinity);
-            let orderList = await getSteamOrderList(buff_item_id, steam_market_url);
-            if (orderList.success) {
-                steam_highest_buy_order = orderList.highest_buy_order && {
-                    origin: orderList.highest_buy_order,
-                    cny: FtoC(orderList.highest_buy_order)
-                };
-                steam_lowest_sell_order = orderList.lowest_sell_order && {
-                    origin: orderList.lowest_sell_order,
-                    cny: FtoC(orderList.lowest_sell_order)
-                };
-                // 没有有效的订购单
-                if (orderList.buy_order_table == "") {
-                    $(target).after($(STEAM_ORDER_NUMBER_ERROR_TEMPLATE).text("没有有效订购单"));
-                } else {
-                    let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order.cny);
-                    if (helper_config.displaySoldNumber) {
-                        let soldNumber = await getSteamSoldNumber(item.appid, item.market_hash_name);
-                        if (soldNumber.success) {
-                            soldNumber.volume = soldNumber.volume.replace(",", "");
-                            $(good).attr("data-sold_number-sort", soldNumber.volume || 0);
-                            $(target).after($(STEAM_SOLD_NUMBER_TEMPLATE).text((soldNumber.volume || 0) + "┊"));
-                        } else {
-                            let text = soldNumber.statusTextShort;
-                            $(target).after($(STEAM_SOLD_NUMBER_TEMPLATE).text((text ? text : "错误") + "┊"));
-                        }
-                    } else {
-                        let orderNumber = $(orderList.buy_order_summary)[0].innerText;
-                        $(good).attr("data-order-sort", steamOrderScale);
-                        $(target).after($(STEAM_ORDER_NUMBER_TEMPLATE).text(orderNumber + "┊"));
-                    }
-                    paintingGradient(steamOrderScale, target, 4, STEAM_ORDER_SCALE_TEMPLATE);
-                }
+            if (helper_config.buffSellThreshold >= buff_sell_num) {
+                $(good).attr("data-buff-sort", Infinity);
+                $(target).after($(HIGHLIGHT_TEMPLATE).text("已忽略"));
             } else {
-                if ((!secendTry) && orderList.status == 500) {
-                    setTimeout(() => {
-                        marketListLoadData(item, good, randomID, true);
-                    }, 100);
-                    return;
+                let orderList = await getSteamOrderList(buff_item_id, steam_market_url);
+                if (orderList.success) {
+                    steam_highest_buy_order = orderList.highest_buy_order && {
+                        origin: orderList.highest_buy_order,
+                        cny: FtoC(orderList.highest_buy_order)
+                    };
+                    steam_lowest_sell_order = orderList.lowest_sell_order && {
+                        origin: orderList.lowest_sell_order,
+                        cny: FtoC(orderList.lowest_sell_order)
+                    };
+                    // 没有有效的订购单
+                    if (orderList.buy_order_table == "") {
+                        $(target).after($(INFO_TEMPLATE).text("没有有效订购单"));
+                    } else {
+                        let steamOrderScale = getScale(buff_sell_min_price, steam_highest_buy_order.cny);
+                        if (helper_config.displaySoldNumber) {
+                            let soldNumber = await getSteamSoldNumber(item.appid, item.market_hash_name);
+                            if (soldNumber.success) {
+                                soldNumber.volume = soldNumber.volume.replace(",", "");
+                                $(good).attr("data-sold_number-sort", soldNumber.volume || 0);
+                                $(target).after($(STEAM_SOLD_NUMBER_TEMPLATE).text((soldNumber.volume || 0) + "┊"));
+                            } else {
+                                let text = soldNumber.statusTextShort;
+                                $(target).after($(STEAM_SOLD_NUMBER_TEMPLATE).text((text ? text : "错误") + "┊"));
+                            }
+                        } else {
+                            let orderNumber = $(orderList.buy_order_summary)[0].innerText;
+                            $(good).attr("data-order-sort", steamOrderScale);
+                            $(target).after($(STEAM_ORDER_NUMBER_TEMPLATE).text(orderNumber + "┊"));
+                        }
+                        paintingGradient(steamOrderScale, target, 4, STEAM_ORDER_SCALE_TEMPLATE);
+                    }
+                } else {
+                    if ((!secendTry) && orderList.status == 500) {
+                        setTimeout(() => {
+                            marketListLoadData(item, good, randomID, true);
+                        }, 100);
+                        return;
+                    }
+                    $(target).after($(ERROR_TEMPLATE).text(orderList.statusText.split("，")[0]));
                 }
-                $(target).after($(STEAM_ORDER_NUMBER_ERROR_TEMPLATE).text(orderList.statusText.split("，")[0]));
-            }
-            let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order.origin : steam_price_cny);
-            let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order.cny : steam_price_cny);
-            $(good).attr("data-buff-sort", scale);
-            $(target).prepend(`<span>${target.childNodes[0].textContent}</span>`);
-            target.childNodes[1].remove();
-            $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
-            paintingGradient(scale, target, 3);
-            withoutFeePrice = target.children[target.children.length - 2];
-            scale = target.children[target.children.length - 1];
-            let strWidth = 5;
-            for (let i = 0; i < target.children.length; i++) {
-                strWidth += target.children[i].offsetWidth;
-            }
-            let displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/) || [""];
-            let tryMe = 0;
-            while (strWidth >= 192) {
-                switch (tryMe++) {
-                    // 超长以后显示的越少越好，所以不用toFixed以免出现小数是0的情况
-                    case 0:     // 0/1
-                        withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText * 10) / 10;
-                        break;
-                    case 1:     // 0/2
-                        withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText);
-                        break;
-                    case 2:     // 0/1
-                        scale.innerText = Math.round(scale.innerText * 10) / 10;
-                        break;
-                    case 3:     // 0/3
-                        let text = displayPrice[1] + Math.ceil(displayPrice[2]);    // 价格抹零
-                        $(target).text(text);
-                        displayPrice = text.match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
-                        break;
-                    case 4:     // 0/2
-                        scale.innerText = Math.ceil(scale.innerText);
-                        break;
-                    case 5:     // no one's gonna know
-                        // $(target).text((+displayPrice[3]).toString(16));
-                        // withoutFeePrice.innerText = withoutFeePrice.innerText.toString(16);
-                        withoutFeePrice.innerText = "";
-                        strWidth = 0;
-                        continue;
-                }
-                strWidth = 5;
+                let withoutFeePrice = getWithoutFeePrice(steam_lowest_sell_order ? steam_lowest_sell_order.origin : steam_price_cny);
+                let scale = getScale(buff_sell_min_price, steam_lowest_sell_order ? steam_lowest_sell_order.cny : steam_price_cny);
+                $(good).attr("data-buff-sort", scale);
+                $(target).prepend(`<span>${target.childNodes[0].textContent}</span>`);
+                target.childNodes[1].remove();
+                $(target).append($("<span class=\"f_12px f_Bold c_Gray\"></span>").css("margin-left", "5px").text(withoutFeePrice));
+                paintingGradient(scale, target, 3);
+                withoutFeePrice = target.children[target.children.length - 2];
+                scale = target.children[target.children.length - 1];
+                let strWidth = 5;
                 for (let i = 0; i < target.children.length; i++) {
                     strWidth += target.children[i].offsetWidth;
+                }
+                let displayPrice = $(target).text().match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/) || [""];
+                let tryMe = 0;
+                while (strWidth >= 192) {
+                    switch (tryMe++) {
+                        // 超长以后显示的越少越好，所以不用toFixed以免出现小数是0的情况
+                        case 0:     // 0/1
+                            withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText * 10) / 10;
+                            break;
+                        case 1:     // 0/2
+                            withoutFeePrice.innerText = Math.round(withoutFeePrice.innerText);
+                            break;
+                        case 2:     // 0/1
+                            scale.innerText = Math.round(scale.innerText * 10) / 10;
+                            break;
+                        case 3:     // 0/3
+                            let text = displayPrice[1] + Math.ceil(displayPrice[2]);    // 价格抹零
+                            $(target).text(text);
+                            displayPrice = text.match(/([€₽\$¥]\s)((\d+)(\.\d{1,2})?)/);
+                            break;
+                        case 4:     // 0/2
+                            scale.innerText = Math.ceil(scale.innerText);
+                            break;
+                        case 5:     // no one's gonna know
+                            // $(target).text((+displayPrice[3]).toString(16));
+                            // withoutFeePrice.innerText = withoutFeePrice.innerText.toString(16);
+                            withoutFeePrice.innerText = "";
+                            strWidth = 0;
+                            continue;
+                    }
+                    strWidth = 5;
+                    for (let i = 0; i < target.children.length; i++) {
+                        strWidth += target.children[i].offsetWidth;
+                    }
                 }
             }
             if (needSort && (helper_config.sortAfterAllDone ? itemCount == itemNum - 1 : true)) {
@@ -755,6 +764,7 @@
         reverseStickers(helper_config.reverseSticker);
         syncSort();
         $("#helper-setting-pageSize").val(helper_config.pageSize);
+        $("#helper-setting-buffSellThreshold").val(helper_config.buffSellThreshold);
         $("#helper-setting-maxRange").val(helper_config.maxRange);
         $("#helper-setting-minRange").val(helper_config.minRange);
         $("#helper-setting-marketColorLow").val(helper_config.marketColorLow);

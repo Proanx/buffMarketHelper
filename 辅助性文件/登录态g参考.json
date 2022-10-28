@@ -1,0 +1,36 @@
+{
+    "appid": 730,
+    "currency": {
+        "code": "RUB",
+        "default": "CNY",
+        "desc": "Ruble",
+        "rate_base_cny": 8.483427124833998,
+        "rate_base_usd": 61.324998,
+        "symbol": "₽"
+    },
+    "game": "csgo",
+    "locale": "en",
+    "user": {
+        "avatar": "https://g.fp.ps.netease.com/market/file/5c53b3205e6027dcc9923dddT6kDOZ2f02",
+        "id": "U1096214335",
+        "mobile": "139****4568",
+        "nickname": "U1394325114",
+        "steamid": 76561198926586499
+    },
+    "webview_title": "BUFF163 Skins marketplace"
+}
+// 游客状态
+{
+    "appid": 730,
+    "currency": {
+        "code": "CNY",
+        "default": "CNY",
+        "desc": "RMB",
+        "rate_base_cny": 1,
+        "rate_base_usd": 7.2288,
+        "symbol": "¥"
+    },
+    "game": "csgo",
+    "locale": "en",
+    "webview_title": "BUFF163 Skins marketplace"
+}

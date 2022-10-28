@@ -1,0 +1,66 @@
+// 人民币
+{
+    "bookmarked": false, // 是否收藏
+    "buy_max_price": "7.4", // buff最高求购价
+    "buy_num": 8, // buff求购数量
+    "can_bargain": true,
+    "can_search_by_tournament": true,
+    "description": null,
+    "game": "csgo",
+    "has_buff_price_history": true,
+    "id": 877043, // buff商品ID
+    "market_hash_name": "Souvenir Tec-9 | Blast From the Past (Factory New)", // steam市场商品名
+    "market_min_price": "0",
+    "name": "Souvenir Tec-9 | Blast From the Past (Factory New)",
+    "quick_price": "8.9", // 估算秒出价
+    "sell_min_price": "8.91", // buff最低售价
+    "sell_num": 35, // buff在售数量
+    "sell_reference_price": "8.91", // 卖出参考价
+    "short_name": "Souvenir Tec-9 | Blast From the Past",
+    "steam_market_url": "https://steamcommunity.com/market/listings/730/Souvenir%20Tec-9%20%7C%20Blast%20From%20the%20Past%20%28Factory%20New%29",
+    "transacted_num": 0,
+    "goods_info": {
+        "icon_url": "https://g.fp.ps.netease.com/market/file/63210a5b0c02f777c1aa5203ArHx5RGH04",
+        "info": {
+            "tags": {
+                "quality": {
+                    "category": "quality",
+                    "id": 516,
+                    "internal_name": "normal",
+                    "localized_name": "Normal"
+                },
+                "rarity": {
+                    "category": "rarity",
+                    "id": 595,
+                    "internal_name": "rare",
+                    "localized_name": "High Grade"
+                },
+                "type": {
+                    "category": "type",
+                    "id": 580,
+                    "internal_name": "csgo_type_musickit",
+                    "localized_name": "Music kits"
+                }
+            }
+        },
+        "item_id": null,
+        "original_icon_url": "https://g.fp.ps.netease.com/market/file/63210a584940eab63d1c4d60xxOZqCX204",
+        "steam_price": "4.95", // steam参考价（美元）
+        "steam_price_cny": "35.22" // steam参考价（人民币）
+    },
+}
+// 汇率 window.g
+{
+    "appid": 730,
+    "currency": {
+        "code": "RUB",
+        "default": "CNY",
+        "desc": "Ruble",
+        "rate_base_cny": 8.505480326025857,
+        "rate_base_usd": 60.524998,
+        "symbol": "\u20bd"
+    },
+    "game": "csgo",
+    "locale": "en",
+    "webview_title": "BUFF163 Skins marketplace"
+};

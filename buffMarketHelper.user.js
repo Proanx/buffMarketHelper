@@ -2,9 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.38
-// @note            更新于 2022年5月28日17:44:39
-// @supportURL      https://jq.qq.com/?_wv=1027&k=F0sj0vKs
+// @version         2.4.39
+// @note            更新于 2022年10月28日21:10:11
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @license         AGPL-3.0
@@ -17,7 +16,7 @@
 // @grant           GM_getValue
 // @grant           GM_xmlhttpRequest
 // @grant           GM_registerMenuCommand
-// @require         https://lib.baomitu.com/jquery-toast-plugin/1.3.2/jquery.toast.min.js
+// @require         https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery-toast-plugin/1.3.2/jquery.toast.min.js
 // @connect         steamcommunity.com
 // ==/UserScript==
 
@@ -222,10 +221,10 @@
             let price_list = $(".f_Strong");
             let isLogined = $("#navbar-cash-amount").length == 1;
             let isFirstTime = $(".good_scale").length == 0;
-            let steamLink = $(".steam-link").attr("href");
             let buff_item_id = getGoodsId();
             let app_id = data.goods_infos[buff_item_id].appid;
-            let hash_name = encodeURIComponent(data.goods_infos[buff_item_id].market_hash_name);
+            let hash_name = escape(data.goods_infos[buff_item_id].market_hash_name);
+            let steamLink = $(".detail-summ>a").attr("href") || `https://steamcommunity.com/market/listings/${app_id}/${hash_name}`;
             let items = data.items;
             let steam_price_cny = data.goods_infos[buff_item_id].steam_price_cny * 100;
             if (isFirstTime) {
@@ -356,7 +355,7 @@
             let buff_item_id = item.id;                                     // buff商品ID
             let buff_buy_num = item.buy_num;                                // buff求购数量
             let buff_buy_max_price = item.buy_max_price;                    // buff求购最高价
-            let buff_sell_num = item.sell_num;                              // buff出售数量
+            let buff_sell_num = item.sell_num;                              // buff在售数量
             let buff_sell_min_price = item.sell_min_price;                  // buff出售最低价
             let steam_price_cny = item.goods_info.steam_price_cny * 100;    // buff提供的steam国区售价
             let steam_market_url = item.steam_market_url;                   // steam市场链接
@@ -1061,8 +1060,12 @@
     }
 
     function getGoodsId() {
-        let result = window.location.pathname.match(/\d*$/)[0];  //匹配目标参数
-        if (result) return unescape(result); return null; //返回参数值
+        let result = location.pathname.match(/\/goods\/(\d+)/);
+        if (result) return result[1]; return null;
+    }
+
+    function escape(englishName) {
+        return encodeURIComponent(englishName).replaceAll("(", "%28").replaceAll(")", "%29");
     }
 
     // --------------------- copy from steam -----------------------

@@ -2,7 +2,7 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.39
+// @version         2.4.40
 // @note            更新于 2022年10月28日21:10:11
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
@@ -328,7 +328,7 @@
     }
 
     // 市场目录
-    window.buffHelperMarkerListScale = function (items) {
+    window.buffHelperMarkerListScale = async function (items) {
         // 检测商品是否加载完成
         if ($("#j_list_card>ul>li").length == 0) {
             setTimeout(buffHelperMarkerListScale, 100);
@@ -347,7 +347,7 @@
                 updateProgressBar(randomID);
                 continue;
             }
-            marketListLoadData(items[i], goods[i], randomID);
+            await marketListLoadData(items[i], goods[i], randomID);
         }
 
         async function marketListLoadData(item, good, randomID, secendTry) {
@@ -1321,6 +1321,12 @@
                 GM_xmlhttpRequest({
                     url: `https://steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=${steamCurrency.eCurrencyCode}&item_nameid=${steam_item_id}&two_factor=0`,
                     timeout: ajaxTimeout,
+                    headers: {
+                        "referer": steamLink,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Host": "steamcommunity.com",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.35"
+                    },
                     method: "get",
                     onload: function (res) {
                         if (res.status == 200) {
@@ -1358,6 +1364,12 @@
             GM_xmlhttpRequest({
                 url: `https://steamcommunity.com/market/priceoverview/?appid=${app_id}&currency=${steamCurrency.eCurrencyCode}&market_hash_name=${hash_name}`,
                 timeout: ajaxTimeout,
+                headers: {
+                    "referer": `https://steamcommunity.com/market/listings/${app_id}/${hash_name}`,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Host": "steamcommunity.com",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.35"
+                },
                 method: "get",
                 onload: function (res) {
                     if (res.status == 200) {

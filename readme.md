@@ -88,7 +88,7 @@
 ### 不管你是普通人还是开发者，只要建议被采纳都会加进顶部的感谢名单！  ヽ(￣ω￣(￣ω￣〃)ゝ) 快来一起开发插件吧
 
 ### 如果你喜欢这个插件或者喜欢我本人，可以扫这里打赏↓  
-<img src="https://buffmarkethelper.oss-cn-shenzhen.aliyuncs.com/tipcode_large.png"  height="300" width="300">  
+<img src="https://markethelper.buff.pronax.tech/tipcode_large.png"  height="300" width="300">  
 
 <!-- Contributors -->
 [contributors-bitaminkim]:https://keylol.com/forum.php?mod=viewthread&tid=731319
@@ -117,4 +117,4 @@
 [iconograph2-4]:https://s1.ax1x.com/2022/03/25/qt3fbt.gif
 [iconograph2-5]:https://s1.ax1x.com/2022/03/25/qt3WDI.png
 [iconograph2-6]:https://s1.ax1x.com/2022/03/25/qt34VP.png
-[tipcode]:https://buffmarkethelper.oss-cn-shenzhen.aliyuncs.com/tipcode_large.png
+[tipcode]:https://markethelper.buff.pronax.tech/tipcode_large.png

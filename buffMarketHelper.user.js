@@ -365,7 +365,7 @@
             $(good).attr("data-order-sort", Infinity);
             $(good).attr("data-sold_number-sort", Infinity);
             if (helper_config.buffSellThreshold >= buff_sell_num) {
-                $(good).attr("data-buff-sort", Infinity);
+                $(good).attr("data-buff-sort", -1);
                 $(target).after($(HIGHLIGHT_TEMPLATE).text("已忽略"));
             } else {
                 let orderList = await getSteamOrderList(buff_item_id, steam_market_url);

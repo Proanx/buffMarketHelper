@@ -18,8 +18,8 @@ function init() {
             }
             destroy(unload);
             // unload = Progress.init();
-            // header.url += `&page_size=${UserSetting.pageSize}`;
-            header.url += `&page_size=4`;
+            header.url += `&page_size=${UserSetting.pageSize}`;
+            // header.url += `&page_size=4`;
         }
     });
 

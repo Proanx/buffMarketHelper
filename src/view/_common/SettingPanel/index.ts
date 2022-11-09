@@ -1,11 +1,13 @@
 // import _ from "lodash/debounce";
-import SettingPanel from "./panel/SettingPanel.svelte";
 import SettingButton from "./SettingButton.svelte";
+import SettingPanel from "./SettingPanel.svelte";
 import { writable } from "svelte/store";
 
 export let status = writable(false);
 
 function init() {
+
+    GM_addStyle(".toggle-switch:before{transition: var(--fds-control-fast-duration) ease-in-out transform,var(--fds-control-faster-duration) linear height, var(--fds-control-faster-duration) linear width,var(--fds-control-fast-duration) var(--fds-control-fast-out-slow-in-easing) margin,var(--fds-control-faster-duration) linear background !important;}");
 
     let floatBar = document.querySelector(".floatbar>ul");
     let li = document.createElement("li");

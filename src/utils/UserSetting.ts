@@ -1,4 +1,5 @@
 import SortRule, { SortType } from "src/enum/SortRule";
+import { getBeijingTs } from "./DateUtil";
 
 // todo 测试枚举反序列化后的结果
 
@@ -8,13 +9,17 @@ export default class UserSetting {
     static minGradientRange: number = 0.63;
     static marketColorLow: string = "#ff1e1e";
     static marketColorHigh: string = "#5027ff";
-    static sortRule = SortRule.Default;
-    static sortType = SortType.Nature;
+    static sortRule = SortRule[0];
+    static sortType = SortType[0];
     static overrideSortRule: boolean = false;
     static sortAfterAllDone: boolean = true;
-    static buffSellThreshold: number = 0;
+    static buffSellNumThreshold: number = 0;
+    static buffSellPriceThreshold: number = 0;
+    static buffOrderNumThreshold: number = 0;
+    static buffOrderPriceThreshold: number = 0;
     static pageSize: number = 20;
     // 详情页面;
+    static displayBoost: boolean = true;
     static reverseSticker: boolean = false;
     static ignoreExchangeRate: boolean = false;
     static orderTableFloatLeft: boolean = false;
@@ -22,20 +27,23 @@ export default class UserSetting {
     static steamCurrency: string = "CNY";
     static ajaxTimeout: number = 20000;
 
-    private static isFinite: boolean = false;
+    static modifyTime: number = 0;
+    private static isInit: boolean = false;
 
     static get(key: string) {
         return this[key];
     }
 
-    static init(): void {
-        if (!this.isFinite) {
+    static init(force?: boolean): void {
+        if ((!this.isInit) || force) {
             let setting = GM_getValue("USER_SETTING", {});
             for (const key of Object.keys(setting)) {
                 this[key] = setting[key];
             }
+            this.modifyTime = getBeijingTs();
+            GM_setValue("SETTING_TIMSTAMP", this.modifyTime);
         }
-        this.isFinite = true;
+        this.isInit = true;
     }
 
     static reset(): void {
@@ -50,30 +58,43 @@ export default class UserSetting {
         for (const key of Object.keys(this)) {
             temp[key] = this[key];
         }
+        this.modifyTime = getBeijingTs();
+        GM_setValue("SETTING_TIMSTAMP", this.modifyTime);
         GM_setValue("USER_SETTING", temp);
     }
 
     private static readonly DEFAULT_CONFIG: object = {
         pageSize: 20,
         ajaxTimeout: 20000,
+        displayBoost: true,
         maxGradientRange: 1,
         steamCurrency: "CNY",
-        buffSellThreshold: 0,
+        sortRule: SortRule[0],
+        sortType: SortType[0],
         reverseSticker: false,
         sortAfterAllDone: true,
         minGradientRange: 0.63,
         overrideSortRule: false,
+        buffSellNumThreshold: 0,
+        buffOrderNumThreshold: 0,
         marketColorLow: "#ff1e1e",
-        sortType: SortType.Nature,
         ignoreExchangeRate: false,
         orderTableFloatLeft: false,
         marketColorHigh: "#5027ff",
-        sortRule: SortRule.Default,
+        buffSellPriceThreshold: 0,
+        buffOrderPriceThreshold: 0,
     };
 
 }
 
 UserSetting.init();
+
+// 用于多页面之间同步设置
+window.addEventListener("focus", function () {
+    if (GM_getValue("SETTING_TIMSTAMP", 0) != UserSetting.modifyTime) {
+        UserSetting.init(true);
+    }
+});
 
 // class Setting {
 //     id: string;

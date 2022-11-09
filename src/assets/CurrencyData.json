@@ -9,7 +9,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "阿联酋",
-        "currencyName": "阿联酋迪拉姆"
+        "currencyName": "阿联酋迪拉姆",
+        "shortName": "迪拉姆"
     },
     "ARS": {
         "strCode": "ARS",
@@ -21,7 +22,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "阿根廷",
-        "currencyName": "阿根廷比索"
+        "currencyName": "阿根廷比索",
+        "shortName": "比索"
     },
     "AUD": {
         "strCode": "AUD",
@@ -33,7 +35,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "澳大利亚",
-        "currencyName": "澳大利亚元"
+        "currencyName": "澳大利亚元",
+        "shortName": "澳元"
     },
     "BRL": {
         "strCode": "BRL",
@@ -45,7 +48,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "巴西",
-        "currencyName": "巴西雷亚尔"
+        "currencyName": "巴西雷亚尔",
+        "shortName": "雷亚尔"
     },
     "CAD": {
         "strCode": "CAD",
@@ -57,7 +61,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "加拿大",
-        "currencyName": "加拿大元"
+        "currencyName": "加拿大元",
+        "shortName": "加币"
     },
     "CHF": {
         "strCode": "CHF",
@@ -69,7 +74,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "瑞士",
-        "currencyName": "瑞士法郎"
+        "currencyName": "瑞士法郎",
+        "shortName": "法郎"
     },
     "CLP": {
         "strCode": "CLP",
@@ -81,7 +87,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "智利",
-        "currencyName": "智利比索"
+        "currencyName": "智利比索",
+        "shortName": "比索"
     },
     "CNY": {
         "strCode": "CNY",
@@ -93,7 +100,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "中国",
-        "currencyName": "人民币"
+        "currencyName": "人民币",
+        "shortName": "人民币"
     },
     "COP": {
         "strCode": "COP",
@@ -105,7 +113,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "哥伦比亚",
-        "currencyName": "哥伦比亚比索"
+        "currencyName": "哥伦比亚比索",
+        "shortName": "比索"
     },
     "CRC": {
         "strCode": "CRC",
@@ -117,7 +126,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "哥斯达黎加",
-        "currencyName": "哥斯达黎加科朗"
+        "currencyName": "哥斯达黎加科朗",
+        "shortName": "科朗"
     },
     "CZK": {
         "strCode": "CZK",
@@ -129,7 +139,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "捷克",
-        "currencyName": "捷克克朗"
+        "currencyName": "捷克克朗",
+        "shortName": "克朗"
     },
     "DKK": {
         "strCode": "DKK",
@@ -141,7 +152,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "丹麦",
-        "currencyName": "丹麦克朗"
+        "currencyName": "丹麦克朗",
+        "shortName": "克朗"
     },
     "EUR": {
         "strCode": "EUR",
@@ -153,7 +165,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "欧盟",
-        "currencyName": "欧元"
+        "currencyName": "欧元",
+        "shortName": "欧元"
     },
     "GBP": {
         "strCode": "GBP",
@@ -165,7 +178,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "英国",
-        "currencyName": "英镑"
+        "currencyName": "英镑",
+        "shortName": "英镑"
     },
     "HKD": {
         "strCode": "HKD",
@@ -177,7 +191,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "香港",
-        "currencyName": "港币"
+        "currencyName": "港币",
+        "shortName": "港币"
     },
     "HRK": {
         "strCode": "HRK",
@@ -189,7 +204,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "克罗地亚",
-        "currencyName": "克罗地亚库纳"
+        "currencyName": "克罗地亚库纳",
+        "shortName": "库纳"
     },
     "HUF": {
         "strCode": "HUF",
@@ -201,7 +217,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "匈牙利",
-        "currencyName": "匈牙利福林"
+        "currencyName": "匈牙利福林",
+        "shortName": "福林"
     },
     "IDR": {
         "strCode": "IDR",
@@ -213,7 +230,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "印度尼西亚",
-        "currencyName": "印尼盾"
+        "currencyName": "印尼盾",
+        "shortName": "印尼盾"
     },
     "ILS": {
         "strCode": "ILS",
@@ -225,7 +243,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "以色列",
-        "currencyName": "以色列新谢克尔"
+        "currencyName": "以色列新谢克尔",
+        "shortName": "新谢克尔"
     },
     "INR": {
         "strCode": "INR",
@@ -237,7 +256,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "印度",
-        "currencyName": "印度卢比"
+        "currencyName": "印度卢比",
+        "shortName": "卢比"
     },
     "JPY": {
         "strCode": "JPY",
@@ -249,7 +269,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "日本",
-        "currencyName": "日元"
+        "currencyName": "日元",
+        "shortName": "日元"
     },
     "KRW": {
         "strCode": "KRW",
@@ -261,7 +282,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "韩国",
-        "currencyName": "韩元"
+        "currencyName": "韩元",
+        "shortName": "韩元"
     },
     "KWD": {
         "strCode": "KWD",
@@ -273,7 +295,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "科威特",
-        "currencyName": "科威特第纳尔"
+        "currencyName": "科威特第纳尔",
+        "shortName": "第纳尔"
     },
     "KZT": {
         "strCode": "KZT",
@@ -285,7 +308,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "哈萨克斯坦",
-        "currencyName": "哈萨克斯坦坚戈"
+        "currencyName": "哈萨克斯坦坚戈",
+        "shortName": "坚戈"
     },
     "MXN": {
         "strCode": "MXN",
@@ -297,7 +321,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "墨西哥",
-        "currencyName": "墨西哥比索"
+        "currencyName": "墨西哥比索",
+        "shortName": "比索"
     },
     "MYR": {
         "strCode": "MYR",
@@ -309,7 +334,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "马来西亚",
-        "currencyName": "马来西亚令吉"
+        "currencyName": "马来西亚令吉",
+        "shortName": "林吉特"
     },
     "NOK": {
         "strCode": "NOK",
@@ -321,7 +347,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "挪威",
-        "currencyName": "挪威克朗"
+        "currencyName": "挪威克朗",
+        "shortName": "克朗"
     },
     "NZD": {
         "strCode": "NZD",
@@ -333,7 +360,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "新西兰",
-        "currencyName": "新西兰元"
+        "currencyName": "新西兰元",
+        "shortName": "纽币"
     },
     "PEN": {
         "strCode": "PEN",
@@ -345,7 +373,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "秘鲁",
-        "currencyName": "秘鲁索尔"
+        "currencyName": "秘鲁索尔",
+        "shortName": "索尔"
     },
     "PHP": {
         "strCode": "PHP",
@@ -357,7 +386,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "菲律宾",
-        "currencyName": "菲律宾比索"
+        "currencyName": "菲律宾比索",
+        "shortName": "比索"
     },
     "PLN": {
         "strCode": "PLN",
@@ -369,7 +399,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "波兰",
-        "currencyName": "波兰兹罗提"
+        "currencyName": "波兰兹罗提",
+        "shortName": "兹罗提"
     },
     "QAR": {
         "strCode": "QAR",
@@ -381,7 +412,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "卡塔尔",
-        "currencyName": "卡塔尔里亚尔"
+        "currencyName": "卡塔尔里亚尔",
+        "shortName": "里亚尔"
     },
     "RMB": {
         "strCode": "RMB",
@@ -393,7 +425,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "中国",
-        "currencyName": "人民币"
+        "currencyName": "人民币",
+        "shortName": "人民币"
     },
     "RON": {
         "strCode": "RON",
@@ -405,7 +438,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "罗马尼亚",
-        "currencyName": "罗马尼亚列伊"
+        "currencyName": "罗马尼亚列伊",
+        "shortName": "列伊"
     },
     "RUB": {
         "strCode": "RUB",
@@ -417,7 +451,8 @@
         "strThousandsSeparator": "",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "俄罗斯",
-        "currencyName": "俄罗斯卢布"
+        "currencyName": "俄罗斯卢布",
+        "shortName": "卢布"
     },
     "SAR": {
         "strCode": "SAR",
@@ -429,7 +464,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "沙特阿拉伯",
-        "currencyName": "沙特里亚尔"
+        "currencyName": "沙特里亚尔",
+        "shortName": "里亚尔"
     },
     "SEK": {
         "strCode": "SEK",
@@ -441,7 +477,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "瑞典",
-        "currencyName": "瑞典克朗"
+        "currencyName": "瑞典克朗",
+        "shortName": "克朗"
     },
     "SGD": {
         "strCode": "SGD",
@@ -453,7 +490,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "新加坡",
-        "currencyName": "新加坡元"
+        "currencyName": "新加坡元",
+        "shortName": "新币"
     },
     "THB": {
         "strCode": "THB",
@@ -465,7 +503,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "泰国",
-        "currencyName": "泰铢"
+        "currencyName": "泰铢",
+        "shortName": "泰铢"
     },
     "TRY": {
         "strCode": "TRY",
@@ -477,7 +516,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "土耳其",
-        "currencyName": "土耳其里拉"
+        "currencyName": "土耳其里拉",
+        "shortName": "里拉"
     },
     "TWD": {
         "strCode": "TWD",
@@ -489,7 +529,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "台湾",
-        "currencyName": "新台币"
+        "currencyName": "新台币",
+        "shortName": "新台币"
     },
     "UAH": {
         "strCode": "UAH",
@@ -501,7 +542,8 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "乌克兰",
-        "currencyName": "乌克兰格里夫纳"
+        "currencyName": "乌克兰格里夫纳",
+        "shortName": "格里夫纳"
     },
     "USD": {
         "strCode": "USD",
@@ -513,7 +555,8 @@
         "strThousandsSeparator": ",",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "美国",
-        "currencyName": "美元"
+        "currencyName": "美元",
+        "shortName": "美元"
     },
     "UYU": {
         "strCode": "UYU",
@@ -525,7 +568,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "乌拉圭",
-        "currencyName": "乌拉圭比索"
+        "currencyName": "乌拉圭比索",
+        "shortName": "比索"
     },
     "VND": {
         "strCode": "VND",
@@ -537,7 +581,8 @@
         "strThousandsSeparator": ".",
         "strSymbolAndNumberSeparator": "",
         "strCountry": "越南",
-        "currencyName": "越南盾"
+        "currencyName": "越南盾",
+        "shortName": "越南盾"
     },
     "ZAR": {
         "strCode": "ZAR",
@@ -549,6 +594,7 @@
         "strThousandsSeparator": " ",
         "strSymbolAndNumberSeparator": " ",
         "strCountry": "南非",
-        "currencyName": "南非兰特"
+        "currencyName": "南非兰特",
+        "shortName": "兰特"
     }
 }

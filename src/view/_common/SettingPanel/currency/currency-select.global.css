@@ -1,52 +1,24 @@
-.exchange-rate {
+.list-item.exchange-rate {
+    cursor: pointer;
     margin-inline-start: 10px;
-    /* color: #228b22; */
+    inline-size: auto;
 }
 
 .currency-select {
     --boxWidth: 190px;
-    display: inline-block !important;
     width: var(--boxWidth) !important;
-    position: relative;
-    flex-shrink: 0;
-}
-
-.currency-select.expanded .expander-header {
-    border-radius: 4px 4px 0 0 !important;
-}
-
-.currency-select .expander-header {
-    padding: 3px !important;
-    padding-left: 16px !important;
-    width: var(--boxWidth);
-}
-
-.currency-select .expander-header .expander-chevron {
-    margin-inline-start: 10px;
 }
 
 .currency-select .expander-header .expander-header-title {
-    display: flex;
-    justify-content: space-between;
+    justify-content: space-between !important;
 }
 
-.currency-select .expander-content {
-    padding: 0 !important;
-    padding-top: 2px !important;
-    height: 20vh;
-    overflow-y: scroll;
-    background-color: #fafafae6 !important;
+.currency-select .expander-header {
+    width: var(--boxWidth);
 }
 
 .currency-select.expander>.expander-content-anchor {
-    position: absolute;
     width: var(--boxWidth);
-    top: 40px;
-    z-index: 1;
-}
-
-.currency-list .list-item>* {
-    pointer-events: none;
 }
 
 .currency-list .text-block.type-body {

@@ -6,6 +6,7 @@
     import SteamERROR from "@fluentui/svg-icons/icons/prohibited_20_regular.svg";
     import SteamDND from "@fluentui/svg-icons/icons/circle_20_regular.svg";
     import VersionTag from "@fluentui/svg-icons/icons/tag_20_regular.svg";
+    import Close from "@fluentui/svg-icons/icons/dismiss_20_regular.svg";
     import { ContentDialog, ListItem } from "fluent-svelte";
     import ConnectStatus from "src/enum/SteamConnectStatus";
     import { checkSteamConnection } from "src/api/steam";
@@ -15,7 +16,7 @@
     import Steam from "src/utils/SteamConnectivity";
     import SettingContent from "./setting.svx";
     import { onMount, tick } from "svelte";
-    import { status } from "../index";
+    import { status } from "./index";
     import "fluent-svelte/theme.css";
 
     let open = false;
@@ -43,7 +44,7 @@
         // });
     });
 
-    function syncStatus() {
+    function close() {
         status.set(false);
     }
 
@@ -62,10 +63,11 @@
 
     async function afterDialogOpen() {
         await tick();
-        let style = getComputedStyle(headings[0]);
-        whiteSpaceHeight =
-            headings &&
-            content.offsetHeight - (content.scrollHeight - headings[0].offsetTop) + parseInt(style.paddingTop);
+        // let style = getComputedStyle(headings[0]);
+        // whiteSpaceHeight =
+        //     headings &&
+        //     content.offsetHeight - (content.scrollHeight - headings[0].offsetTop) + parseInt(style.paddingTop);
+        whiteSpaceHeight = headings && content.offsetHeight - (content.scrollHeight - headings[0].offsetTop);
     }
 
     function settingChange(e) {
@@ -73,13 +75,14 @@
             UserSetting[e.detail.attr] = e.detail.val;
             UserSetting.save();
         }
-        console.log("收到了", UserSetting[e.detail.attr]);
+        console.log("收到了", e.detail.attr, UserSetting[e.detail.attr]);
     }
 </script>
 
 <ContentDialog
+    class="setting-dialog"
     bind:open
-    on:backdropclick={syncStatus}
+    on:backdropclick={close}
     on:open={afterDialogOpen}
     on:close={() => {
         whiteSpaceHeight = 0; // 不清零会导致下一次开启时长度计算故障
@@ -114,15 +117,21 @@
         <ListItem disabled={!haveNewVersion} on:click={openInstallPage}>
             <svelte:fragment slot="icon">
                 {#if haveNewVersion}
-                    <NewVersion style="width:20px" />
+                    <NewVersion />
                 {:else}
-                    <VersionTag style="width:20px" />
+                    <VersionTag />
                 {/if}
             </svelte:fragment>
             <!-- svelte-ignore missing-declaration -->
             版本：{GM_info.script.version}
         </ListItem>
         <Toc target={content} />
+        <ListItem on:click={close} style="color:grey;justify-content:center;padding-inline-end:20px;margin-top: auto;">
+            <svelte:fragment slot="icon">
+                <Close />
+            </svelte:fragment>
+            关闭窗口
+        </ListItem>
     </aside>
     <article class="markdown-body" bind:this={content}>
         <SettingContent on:message={settingChange} />
@@ -131,12 +140,13 @@
 </ContentDialog>
 
 <style>
-    :global(.content-dialog-body) {
+    :global(.setting-dialog > .content-dialog-body) {
         display: flex;
         max-height: 75vh;
     }
-    :global(.content-dialog) {
+    :global(.setting-dialog) {
         width: 85vw !important;
+        max-width: 1000px !important;
     }
     :global(.list-item > svg:first-child) {
         width: 20px;
@@ -157,19 +167,21 @@
 
     aside {
         width: 180px;
+        height: 75vh;
         display: inline-flex;
         flex-direction: column;
         flex-wrap: nowrap;
-        align-content: flex-start;
-        margin-right: 10px;
+        padding: 0;
+        padding-right: 10px;
+        inset-block-start: 10px;
     }
 
     article {
         padding: 0 30px;
+        margin-block-start: 10px;
     }
 
     article:first-child {
         padding-block-start: 0;
     }
-
 </style>

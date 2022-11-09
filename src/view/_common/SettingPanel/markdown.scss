@@ -2,6 +2,62 @@
     flex: 8;
     overflow: scroll;
 
+    .expander {
+        display: inline-block !important;
+        inline-size: auto !important;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .expanded .expander-header {
+        border-radius: 4px 4px 0 0 !important;
+    }
+
+    .expander-header {
+        padding: 3px !important;
+        padding-left: 16px !important;
+    }
+
+    .expander-header .expander-chevron {
+        margin-inline-start: 10px;
+    }
+
+    .expander-header .expander-header-title {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .expander-content {
+        padding: 0 !important;
+        padding-top: 2px !important;
+        max-height: 20vh;
+        overflow-y: scroll;
+        background-color: #fafafaf2 !important;
+    }
+
+    .expander>.expander-content-anchor {
+        top: 40px;
+        z-index: 1;
+        position: absolute;
+    }
+
+    .expander-content .list-item>* {
+        pointer-events: none;
+    }
+
+    .person-picture-container {
+        display: inline-flex !important;
+    }
+
+    .toggle-switch-container {
+        vertical-align: middle;
+    }
+
+    ol,
+    ul {
+        list-style: auto;
+    }
+
     a.button {
         vertical-align: middle;
     }
@@ -12,19 +68,19 @@
         border-width: 1px 0 0 0;
     }
 
-    span.title {
+    .title {
         line-height: 1rem;
         font-size: 18px;
         letter-spacing: 1px;
         margin-inline-end: 10px;
-        display: inline-block;
+        // display: inline-block;
         color: #525252;
         font-weight: 600;
         vertical-align: baseline;
         font-family: var(--fds-font-family-display);
     }
 
-    span.label {
+    .label {
         font-size: 0.8rem;
         letter-spacing: 1px;
         display: block;
@@ -35,7 +91,7 @@
         font-family: var(--fds-font-family-display);
     }
 
-    div.describe {
+    .describe {
         font-size: 0.75rem;
         line-height: 1.33333;
         letter-spacing: 0.32px;

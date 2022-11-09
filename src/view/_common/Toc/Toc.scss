@@ -1,14 +1,19 @@
 .table-of-contents {
+	overflow: auto;
+	padding-right: 5px;
+
 	li {
 		list-style-type: none;
 		margin: 0;
 		padding: 0;
 		margin-left: calc(14px * var(--depth));
 	}
+
 	:global(.list-item) {
 		margin-inline: 0;
 		inline-size: 100%;
 		block-size: 28px;
+
 		:global(.text-block) {
 			white-space: nowrap;
 			overflow: hidden;

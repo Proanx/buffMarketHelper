@@ -1,0 +1,135 @@
+<script lang="ts">
+    import ReverseSticker from "src/view/_common/SettingPanel/reverseSticker/ReverseSticker.svelte";
+    import CurrencySelector from "src/view/_common/SettingPanel/currency/CurrencySelector.svelte";
+    import OrderTablePos from "src/view/_common/SettingPanel/orderTablePos/OrderTablePos.svelte";
+    import MarketFilter from "src/view/_common/SettingPanel/marketFilter/MarketFilter.svelte";
+    import LoadingRange from "src/view/_common/SettingPanel/loadingRange/LoadingRange.svelte";
+    import DisplayBoost from "src/view/_common/SettingPanel/displayBoost/DisplayBoost.svelte";
+    import Contributors from "src/view/_common/SettingPanel/contributors/Contributors.svelte";
+    import ExchangeCheck from "src/view/_common/SettingPanel/currency/ExchangeCheck.svelte";
+    import BillBoard from "src/view/_common/SettingPanel/billBoard/BillBoard.svelte";
+    import SortSetting from "src/view/_common/SettingPanel/sort/SortSetting.svelte";
+    import CurrencyData from "src/assets/CurrencyData.json";
+    import UserSetting from "src/utils/UserSetting";
+    import Reset from "./reset/reset.svelte";
+    import { Tucao } from "src/utils/Tucao";
+    import { Button } from "fluent-svelte";
+    import "./markdown.scss";
+
+    let isLoggedIn = g.user != undefined;
+
+    function quTuCao(){
+        if (!g.user) { window.open("https://support.qq.com/product/450213","_blank"); return; }
+        Tucao({
+            openid: g.user.steamid + g.user.id,
+            nickname: g.user.nickname,
+            avatar: g.user.avatar,
+        });
+    }
+
+</script>
+
+<style>
+    .feedback-warning{
+        color:red;
+        font-size: 16px;
+        font-weight: 100;
+    }
+</style>
+
+<!-- ## 公告
+
+<BillBoard /> -->
+
+## 版本更新说明
+
+3.0.0 发布日期：2022-11-3
+1. 重构插件
+2. 收藏页面添加比例功能
+3. 为主要功能添加开关用于安装了同类型插件时减少请求
+
+<Button variant="hyperlink" target="_blank" href="https://github.com/Proanx/buffMarketHelper/commits/master" >查看GIT提交记录</Button>
+
+## 基础设置
+
+这里的设置会应用到所有可能的页面
+
+### STEAM货币设定
+> <CurrencySelector on:message />
+> 
+> --------
+> 
+> <ExchangeCheck on:message />
+
+## BUFF市场设置
+
+### 每页加载数量
+
+> <LoadingRange on:message />
+
+### 饰品过滤设定
+
+在对应条件大于等于门槛数值时才会请求steam数据，同时设置了多个条件时需要全部满足才会发送请求，数值为0或者不填时表示关闭
+
+> <MarketFilter on:message />
+
+### 排序设定
+
+只能对页面内的商品进行排序，并不是buff全局排序
+
+> <SortSetting on:message />
+
+## BUFF商品设置
+
+### 求购列表设定
+
+> <OrderTablePos on:message />
+
+### CSGO饰品设定
+
+这些设置只影响CSGO板块
+
+> <DisplayBoost on:message />
+> 
+> --------
+> 
+> <ReverseSticker on:message />
+
+## 关于插件
+
+### 使用指南
+
+<Button target="_blank" variant="hyperlink" href="https://greasyfork.org/zh-CN/scripts/410137#additional-info">插件介绍</Button>
+<Button target="_blank" variant="hyperlink" href="https://support.qq.com/product/450213/faqs-more">常见问题</Button>
+<Button target="_blank" variant="hyperlink" href="https://github.com/Proanx/buffMarketHelper">开源页面</Button>
+
+### 反馈渠道
+
+插件已接入新的反馈社区，使用插件的过程中遇到了困难可以直接到社区内查找解决办法，如果有改进建议或者是发现了BUG，也可以直接在社区内提出
+
+{#if isLoggedIn}
+    <Button class="tucao-btn" on:click={quTuCao} variant={isLoggedIn?"accent":"standard"}>使用BUFF快速登录</Button>
+{/if}  
+<Button target="_blank" variant={isLoggedIn?"standard":"accent"} href="https://support.qq.com/product/450213">进入吐槽社区</Button>
+
+----------------
+
+###### 其他反馈方式  
+<Button variant="hyperlink" target="_blank" href="https://greasyfork.org/zh-CN/scripts/410137/feedback">GreasyFork反馈</Button>
+<Button variant="hyperlink" target="_blank" href="https://github.com/Proanx/buffMarketHelper/issues">Github反馈</Button>
+<Button variant="hyperlink" href="mailto:funkyturkey@yeah.net?subject=[{GM_info.script.version}]插件反馈" style="user-select:text">邮箱：funkyturkey@yeah.net</Button>
+<Button variant="hyperlink" href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=515033811" style="user-select:text">QQ：515033811</Button>
+<br />
+<span class="feedback-warning">当前无意承接<b>任何</b>形式的付费如插件定制、商业合作、科学上网等包括但不限于此的业务，相关人员自行绕道</span>  
+
+### 开源信息
+
+插件代码托管在[GitHub](https://github.com/Proanx/buffMarketHelper)，欢迎各位大神参与一起维护
+
+### 开发者列表
+
+<Contributors />
+
+## 恢复默认设置
+
+<Reset/>

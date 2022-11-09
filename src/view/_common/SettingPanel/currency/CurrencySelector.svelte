@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { ListItem, Expander, TextBlock, Flyout } from "fluent-svelte";
+    import { ListItem, Expander } from "fluent-svelte";
     import { getSteamExchangeRate } from "src/api/steam";
     import { createEventDispatcher, onMount, tick } from "svelte";
     import CurrencyData from "src/assets/CurrencyData.json";
     import UserSetting from "src/utils/UserSetting";
     import "./currency-select.global.css";
-    import JsonResult from "src/entity/JsonResult";
+    // import JsonResult from "src/entity/JsonResult";
     import { secDiff, toDescribeText } from "src/utils/DateUtil";
     import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 
@@ -24,7 +24,7 @@
 
     onMount(async () => {
         await tick();
-        window.onclick = (e) => {
+        document.onclick = (e) => {
             if (expanded) {
                 let dom = document.querySelector(".currency-select");
                 if (!dom?.contains(e.target)) {
@@ -88,23 +88,38 @@
             </div>
         </svelte:fragment>
     </Expander>
-    <TextBlock class="exchange-rate" variant="body">
-        <ListItem style="cursor: pointer" on:click={() => (promise = updateExchangeRate(true))}>
-            {#await promise}
-                正在读取汇率信息
-            {:then result}
-                <sl-tooltip content={"更新于：" + toDescribeText(secDiff(result.time_update_unix))} hoist>
+    <ListItem class="exchange-rate" on:click={() => (promise = updateExchangeRate(true))}>
+        {#await promise}
+            正在读取汇率信息
+        {:then result}
+            <span>{"上次更新：" + toDescribeText(secDiff(result.time_update_unix))}</span>
+            <!-- <sl-tooltip content={"上次更新：" + toDescribeText(secDiff(result.time_update_unix))} hoist>
                     <span>
-                        汇率：1 ∶ {result.CtoF}
+                        1 人民币 ∶ {result.CtoF}
+                        {currency.currencyName} 1 ∶ {result.FtoC} 人民币
                     </span>
-                </sl-tooltip>
-            {:catch err}
-                获取汇率失败：{err.smsg}
-            {/await}
-        </ListItem>
-    </TextBlock>
+                </sl-tooltip> -->
+        {:catch err}
+            获取汇率失败：{err.smsg}
+        {/await}
+    </ListItem>
 </div>
-<div class="describe">会根据所选货币获取STEAM价格，获取失败且没有历史汇率信息时会切回人民币，汇率比为 人民币∶外汇</div>
+<div class="currency-display">
+    {#await promise}
+        正在读取汇率信息
+    {:then result}
+        <span>{"上次更新：" + toDescribeText(secDiff(result.time_update_unix))}</span>
+        <!-- <sl-tooltip content={"上次更新：" + toDescribeText(secDiff(result.time_update_unix))} hoist>
+                <span>
+                    1 人民币 ∶ {result.CtoF}
+                    {currency.currencyName} 1 ∶ {result.FtoC} 人民币
+                </span>
+            </sl-tooltip> -->
+    {:catch err}
+        获取汇率失败：{err.smsg}
+    {/await}
+</div>
+<div class="describe">会根据所选货币获取STEAM价格，获取失败且没有历史汇率信息时会切回人民币</div>
 
 <style lang="scss">
     .select-box {

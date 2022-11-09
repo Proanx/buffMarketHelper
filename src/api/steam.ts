@@ -15,6 +15,12 @@ export function getSteamExchangeRate(): Promise<JsonResult> {
         GM_xmlhttpRequest({
             // 10000元锚点
             url: `https://steamcommunity.com/market/listings/730/Souvenir%20Sawed-Off%20|%20Snake%20Camo%20(Well-Worn)/render/?query=&start=40&count=100&currency=${CurrencyData[UserSetting.steamCurrency].eCurrencyCode}`,
+            headers: {
+                "referer": `https://steamcommunity.com/market/listings/730/Souvenir%20Sawed-Off%20|%20Snake%20Camo%20(Well-Worn)`,
+                "X-Requested-With": "XMLHttpRequest",
+                "Host": "steamcommunity.com",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.35"
+            },
             method: "get",
             timeout: UserSetting.ajaxTimeout,
             onload: function (response) {
@@ -113,6 +119,12 @@ export function getSteamOrderList(buff_item_id: number, steamLink: string): Prom
         }
         GM_xmlhttpRequest({
             url: `https://steamcommunity.com/market/itemordershistogram?country=CN&language=schinese&currency=${CurrencyData[UserSetting.steamCurrency].eCurrencyCode}&item_nameid=${itemDetail.data}&two_factor=0`,
+            headers: {
+                "referer": steamLink,
+                "X-Requested-With": "XMLHttpRequest",
+                "Host": "steamcommunity.com",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.35"
+            },
             timeout: UserSetting.ajaxTimeout,
             method: "get",
             onload: function (res) {
@@ -164,6 +176,12 @@ export function getItemId(buff_item_id: number, steamLink: string): Promise<Json
         }
         GM_xmlhttpRequest({
             url: steamLink,
+            headers: {
+                "referer": "steamcommunity.com/market",
+                "X-Requested-With": "XMLHttpRequest",
+                "Host": "steamcommunity.com",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.35"
+            },
             timeout: UserSetting.ajaxTimeout,
             method: "get",
             onload: function (res) {

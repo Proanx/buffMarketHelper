@@ -1,17 +1,17 @@
 enum SortRule {
-    Default,
-    SellScale,          // 挂刀比例
-    OrderScale,         // 求购比例
-    BuffOrderNum,       // buff求购数量
-    BuffOnSellNum,      // buff在售数量
-    BuffOrderPrice,     // buff求购价格
-    SteamSellPrice,     // steam售价
+    默认规则 = 0,
+    挂刀比例,
+    求购挂刀比例,
+    BUFF求购数量,
+    BUFF在售数量,
+    BUFF求购价格,
+    STEAM售价,
 }
 
 export enum SortType {
-    Asc,
-    Desc,
-    Nature,     // 不排序
+    默认顺序 = 0,
+    从低到高,
+    从高到低,
 }
 
 export default SortRule;

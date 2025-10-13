@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.42
-// @note            更新于 2025-9-26 17:17:31
+// @version         2.4.43
+// @note            更新于 2025-10-13 17:00:00
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @license         AGPL-3.0
@@ -144,7 +144,7 @@
 
     if (location.pathname.startsWith("/goods/")) {
         // 自带css
-        GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_sold{margin-top:5px}#steam_order{margin-top:5px}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
+        GM_addStyle(".market_commodity_orders_header_promote {color: whitesmoke;}#steam_sold{margin-top:5px;display:inline-block;}#steam_order{margin-top:5px;display:inline-block;}#steam_order_error{margin-top:5px;font-size: medium;font-weight: bold;color: #ff1e3e;display:inline-block;}.market_listing_price_with_fee{color: #ffae3a;font-size: 12px;margin-left: 6px;}");
         GM_addStyle(".steam-link{float:right;margin-top:3px}.detail-cont>.blank20{height:10px}");
         // 组件css
         GM_addStyle(".paymentIcon{padding:1px 17px 0 !important;position:absolute}a.j_shoptip_handler{margin-right:10px}.user-thum{margin: 0;}.list_tb_csgo>tr>th:first-child{width:5px}.list_tb_csgo>tr>th:nth-child(2){padding-right:9px}.list_tb_csgo>tr>th:nth-child(4){min-width:185px !important}.list_tb_csgo .pic-cont{width:112px;height:84px}.list_tb_csgo .pic-cont img{height:100%;}.csgo_sticker.has_wear{position:absolute;display: inline-block;margin:10px 0 0 270px}.csgo_sticker.has_wear .stickers{width:62px;height:48px;margin:0;background: 0;}.stag{margin:0 0 0 2px !important;padding: 4px 6px;float:none !important}.float_rank{color: green;}.stickers:hover{opacity:1!important}");
@@ -153,6 +153,12 @@
         GM_addStyle(".market_commodity_orders_table.order_float_left{margin: 0 10px 0 0;float: left;}.market_commodity_orders_table{margin: 0 0 0 10px;height:100%;float:right;border-collapse:separate;background-color:rgba(0,0,0,0.3);}.market_commodity_orders_table tr:nth-child(even){background-color:#242b33}.market_commodity_orders_table td{text-align:center;padding:4px}.market_commodity_orders_table th{padding:4px;margin:0;text-align:center;font-size:16px;font-weight:normal}");
         // 求购警告css
         GM_addStyle('#steam_order .warning{ position: relative; margin: 0 0 0 4px; display: inline-flex; vertical-align: text-bottom; } #steam_order .warning .tips { visibility: hidden; position: absolute; width: 200px; top: 100%; left: 0; background: #111111; padding: 4px;} #steam_order:hover .warning .tips { visibility: visible; }');
+        // TODO: 下面的调整主要针对 CS2 饰品的“撤回”公告，避免遮盖磨损度选择，但会让 DOTA2 饰品的页面变丑
+        // 调整物品框的 padding
+        GM_addStyle(".detail-cont{padding:15px 30px 0 0;}");
+        // 限制公告宽度
+        GM_addStyle(".announcement_gold{height: 36px; max-width: 650px; vertical-align: top;}");
+        GM_addStyle(".tag_announcement{height: 36px; max-width: 22px; white-space: wrap;}");
 
         (function initSteamLink() {
             if (!document.querySelector(".detail-cont")) {
@@ -234,9 +240,9 @@
             if (isFirstTime) {
                 getSteamSoldNumber(app_id, hash_name).then((soldNumber) => {
                     if (soldNumber.success) {
-                        $(".detail-cont").append(`<div id="steam_sold">有 <span class="market_commodity_orders_header_promote">${soldNumber.volume || 0}</span> 份在 24 小时内售出</div>`);
+                        $(".detail-cont").append(`<div id="steam_sold">☞ 有 <span class="market_commodity_orders_header_promote">${soldNumber.volume || 0}</span> 份在 24 小时内售出&nbsp;&nbsp;</div>`);
                     } else {
-                        $(".detail-cont").append(`<div id="steam_sold_error">获取steam销量失败，原因：${soldNumber.statusText.split("，")[0]}</div>`);
+                        $(".detail-cont").append(`<div id="steam_sold_error">☞ 获取steam销量失败，原因：${soldNumber.statusText.split("，")[0]}&nbsp;&nbsp;</div>`);
                     }
                 });
                 let orderList = await getSteamOrderList(buff_item_id, steamLink);
@@ -250,7 +256,7 @@
                         cny: FtoC(orderList.lowest_sell_order)
                     };
                     if (orderList.buy_order_table != "") {
-                        $(".detail-cont").append(`<div id='steam_order'>${orderList.buy_order_summary}</div>`);
+                        $(".detail-cont").append(`<div id='steam_order'>☞ ${orderList.buy_order_summary}</div>`);
                         $(".detail-pic").after(orderList.buy_order_table);
                         let buff_sell_price = data.items[0].price;
                         $(".market_commodity_orders_header_promote:last").after(`<small class='market_listing_price_with_fee'>${getScale(buff_sell_price, steam_highest_buy_order.cny)}</small>`);

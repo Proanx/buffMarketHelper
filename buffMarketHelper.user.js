@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.43
-// @note            更新于 2025-10-13 17:00:00
+// @version         2.4.44
+// @note            更新于 2025-10-17 11:16:31
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @license         AGPL-3.0
@@ -1214,34 +1214,13 @@
             return;
         }
         GM_xmlhttpRequest({
-            // 10000元锚点
-            url: `https://steamcommunity.com/market/listings/730/Souvenir%20Sawed-Off%20|%20Snake%20Camo%20(Well-Worn)/render/?query=&start=40&count=100&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
             // 热门锚点
-            // url: `https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Asiimov%20%28Field-Tested%29/render/?start=0&count=50&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
-            url: `https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Redline%20%28Field-Tested%29/render/?start=0&count=50&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
+            url: `https://steamcommunity.com/market/listings/730/AK-47%20%7C%20Asiimov%20%28Field-Tested%29/render/?start=0&count=100&currency=${g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode}`,
             method: "get",
             timeout: ajaxTimeout,
             onload: function (response) {
                 toast && toast.reset();
                 let data = response.status == 200 ? JSON.parse(response.responseText) : {};
-                // if (data.success && data.listinginfo["3296062994072312107"]) {
-                //     if (data.listinginfo["3296062994072312107"].converted_currencyid % 2000 != g_rgCurrencyData[helper_config.steamCurrency].eCurrencyCode) {
-                //         return; // 对结果返回前的多次操作进行屏蔽，只取最后一次的结果
-                //     }
-                //     let timeUnix = Date.now();
-                //     exchangeRate = {
-                //         FtoC: (data.listinginfo["3296062994072312107"].price / data.listinginfo["3296062994072312107"].converted_price).toFixed(6),
-                //         CtoF: (data.listinginfo["3296062994072312107"].converted_price / data.listinginfo["3296062994072312107"].price).toFixed(6),
-                //         currencyCode: g_rgCurrencyData[helper_config.steamCurrency].strCode,
-                //         time_next_update_unix: timeUnix + 10800000,
-                //         time_update_unix: timeUnix
-                //     }
-                //     GM_setValue("exchangeRate", exchangeRate);
-                //     GM_setValue("helper_config", helper_config);
-                //     showMessage("获取汇率成功", `已经同步${helper_config.steamCurrency}的最新汇率`, "success");
-                //     return;
-                // }
-                // in case of emergency
                 // 找到人民币上架的记录，直接通过原货币和目标货币获取汇率
                 if (data.success) {
                     for (let key in data.listinginfo) {

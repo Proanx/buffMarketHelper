@@ -4,12 +4,15 @@
 
 ---
 ## 感谢这些人的帮助与贡献
-|                                           |                                    |
-| ----------------------------------------- | ---------------------------------- |
-| **@lyl001**                               | `提供信息帮助实现每页数量选择功能` |
-| [**Gear Browser**][contributors-gearApp]  | `提供正则修改建议`                 |
-| [**Bitaminkim**][contributors-bitaminkim] | `提供steam地区与货币转换的实现`    |
-| **Kylin**                                 | `建议比例列加入求购比例`           |
+|                                                        |                                                                                |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **@lyl001**                                            | `提供信息帮助实现每页数量选择功能`                                             |
+| [**Gear Browser**][contributors-gearApp]               | `提供正则修改建议`                                                             |
+| [**Keylol: Bitaminkim**][contributors-bitaminkim]      | `提供steam地区与货币转换的实现`                                                |
+| **Kylin**                                              | `建议比例列加入求购比例`                                                       |
+| [**GitHub: @UnluckyNinja**][contributors-UnluckyNinja] | `添加Steam订购单防诈骗提醒`                                                    |
+| [**GitHub: @WBbug**][contributors-WBbug]               | `修复说明文档错误`                                                             |
+| [**GitHub: @Roc136**][contributors-Roc136]             | `新增价格作为筛选条件功能、修复饰品页面的“撤回”公告导致的遮盖磨损度选择的问题` |
 ---
 ## 本插件有以下功能 <a name="intro"></a>  
 
@@ -93,6 +96,9 @@
 <!-- Contributors -->
 [contributors-bitaminkim]:https://keylol.com/forum.php?mod=viewthread&tid=731319
 [contributors-gearApp]:https://gear4.app/
+[contributors-UnluckyNinja]:https://github.com/UnluckyNinja
+[contributors-WBbug]:https://github.com/WBbug
+[contributors-Roc136]:https://github.com/Roc136
 <!-- Link -->
 [steamMarket]:https://steamcommunity.com/market/
 [postFeedback]:https://greasyfork.org/zh-CN/scripts/410137/feedback#post-discussion

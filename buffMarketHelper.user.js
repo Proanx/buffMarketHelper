@@ -2,8 +2,8 @@
 // @name            网易BUFF价格比例(找挂刀)插件
 // @icon            https://s1.ax1x.com/2022/03/25/qt3mcj.png
 // @description     找挂刀，看比例，挑玄学
-// @version         2.4.44
-// @note            更新于 2025-10-17 11:16:31
+// @version         2.4.45
+// @note            更新于 2026-02-18 21:00:03
 // @author          Pronax
 // @homepageURL     https://greasyfork.org/zh-CN/users/412840-newell-gabe-l
 // @license         AGPL-3.0
@@ -488,22 +488,22 @@
         if ($("#market-selling-list").hasClass("buffed")) { return; }
         $("#market-selling-list").addClass("buffed");
         // 不支持微信时给个占位图标
-        let alipayIcon = $(".icon_payment_alipay");
-        for (let i = 0; i < alipayIcon.length; i++) {
-            let element = alipayIcon[i];
-            if (!element.nextElementSibling) {
-                $(element).after('<i class="icon icon_select_wx_small" style="opacity:0;" title="Support BUFF Balances-bank card"></i>');
-            }
-        }
+        // let alipayIcon = $(".icon_payment_alipay");
+        // for (let i = 0; i < alipayIcon.length; i++) {
+        //     let element = alipayIcon[i];
+        //     if (!element.nextElementSibling) {
+        //         $(element).after('<i class="icon icon_select_wx_small" style="opacity:0;" title="Support BUFF Balances-bank card"></i>');
+        //     }
+        // }
         // 支付图标移动到购买按钮下
-        let paymentIcon = $(".icon_payment_alipay,.icon_payment_others").parent();
-        paymentIcon.addClass("paymentIcon on");
-        $(".paymentIcon .icon_payment_alipay").addClass("icon_select_alipay_small").removeClass("icon_payment_alipay");
-        $(".paymentIcon .icon_payment_others").addClass("icon_select_wx_small").removeClass("icon_payment_others");
-        for (let i = 0; i < paymentIcon.length; i++) {
-            const element = paymentIcon[i];
-            $(element).parent().next().append(element);
-        }
+        // let paymentIcon = $(".icon_payment_alipay,.icon_payment_others").parent();
+        // paymentIcon.addClass("paymentIcon on");
+        // $(".paymentIcon .icon_payment_alipay").addClass("icon_select_alipay_small").removeClass("icon_payment_alipay");
+        // $(".paymentIcon .icon_payment_others").addClass("icon_select_wx_small").removeClass("icon_payment_others");
+        // for (let i = 0; i < paymentIcon.length; i++) {
+        //     const element = paymentIcon[i];
+        //     $(element).parent().next().append(element);
+        // }
         // 检测是否支持这个类型/游戏的饰品
         let goods_id = getGoodsId();
         if (data.goods_infos[goods_id].appid != 730 || ENHANCEMENT_SUPPORT_LIST.indexOf(data.goods_infos[goods_id].tags.category_group.internal_name) < 0) { return; }
